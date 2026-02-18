@@ -1,0 +1,37 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\20xen\\source\\repos\\testPlaceholder\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{9A043B53-94DA-4EE4-8564-B9FEA10331DC}|testPlaceholder\\testPlaceholder.csproj|c:\\users\\20xen\\source\\repos\\testplaceholder\\testplaceholder\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9A043B53-94DA-4EE4-8564-B9FEA10331DC}|testPlaceholder\\testPlaceholder.csproj|solutionrelative:testplaceholder\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\20xen\\source\\repos\\testPlaceholder\\testPlaceholder\\Program.cs",
+              "RelativeDocumentMoniker": "testPlaceholder\\Program.cs",
+              "ToolTip": "C:\\Users\\20xen\\source\\repos\\testPlaceholder\\testPlaceholder\\Program.cs",
+              "RelativeToolTip": "testPlaceholder\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-18T12:08:55.606Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -8,5 +8,6 @@ namespace TestReposit
 {
     public class Class1
     {
+        
     }
 }

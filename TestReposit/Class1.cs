@@ -37,6 +37,17 @@ namespace TestReposit
             userTickets = new List<string>();
         }
     }
+    public struct GeoCoords
+    {
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
+
+        public GeoCoords(double newLatitude, double newLongitude)
+        {
+            Latitude = newLatitude;
+            Longitude = newLongitude;
+        }
+    }
     public class Train
     {
         //PROPERTIES
@@ -48,15 +59,20 @@ namespace TestReposit
         public int trainCarriages {  get; private set; }
         //will be used to store the names of each stop on the journey in a list:
         public List<string> trainStops { get; private set; }
+        public string trainLatestStop { get ; private set; }
+        public string trainNextStop { get; private set; }
+
 
         //METHODS
-        public Train(string number, string type, string company, int carriages)
+        public Train(string number, string type, string company, int carriages, string trainLatestStop, string trainNextStop)
         {
             trainNumber = number;
             trainType = type;
             trainCompany = company;
             trainCarriages = carriages;
             trainStops = new List<string>();
+            this.trainLatestStop = trainLatestStop;
+            this.trainNextStop = trainNextStop;
         }
     }
     public class Station

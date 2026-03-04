@@ -43,3 +43,9 @@ CREATE TABLE Info (
 );
 GO
 
+--Sample data:
+INSERT INTO Info (userID, userName, userPass, userAge, userEmail, userPhone)
+VALUES
+	('00000001', 'John Smith', 'Pass123', '45', 'joSmith@email.com', '079-203-6522'),
+	('00000002', 'Jane Smith', 'Pass456', '47', 'jaSmith@email.com', '079-293-4444');
+GO

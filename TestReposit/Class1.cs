@@ -15,6 +15,7 @@ namespace TestReposit
     public class User
     {
         //PROPERTIES
+        public int userID { get; set; }
         public string userName {  get; private set; }
         public string userPass { get; private set; }
         //can be used for recommending tickets types/railcards:

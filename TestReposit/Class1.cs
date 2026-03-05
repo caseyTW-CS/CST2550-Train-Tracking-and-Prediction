@@ -37,6 +37,12 @@ namespace TestReposit
             userPhone = phone;
             userTickets = new List<string>();
         }
+
+        // checks if the password the user typed matches their account
+        public bool validateLogin(string enteredPass)
+        {
+            return userPass == enteredPass;
+        }
     }
     public struct GeoCoords
     {
@@ -150,7 +156,7 @@ public class Journey
         arrivalStation = arrival;
         scheduledDeparture = scheduledDep;
         scheduledArrival = scheduledArr;
-        currentDelayMinutes = 0; // starts with no delay obviously
+        currentDelayMinutes = 0; // starts with no delay 
         stops = new List<JourneyStop>();
     }
 
@@ -172,7 +178,7 @@ public class Journey
         if (currentDelayMinutes == 0)
             return "On Time";
         else if (currentDelayMinutes > 0 && currentDelayMinutes <= 5)
-            return $"Slight Delay ({currentDelayMinutes} mins)"; // within 5 mins is pretty normal tbh
+            return $"Slight Delay ({currentDelayMinutes} mins)"; // within 5 mins
         else if (currentDelayMinutes > 5)
             return $"Delayed ({currentDelayMinutes} mins)";
         else
@@ -227,7 +233,7 @@ public class JourneyStop
 }
 
 // stores info about a disruption or delay and why it happened
-// useful for showing users why their train is late lol
+// useful for showing users why their train is late 
 public class Disruption
 {
     //PROPERTIES
@@ -292,17 +298,6 @@ public class Schedule
     {
         isActive = false;
     }
-    // added methods to User to actually do stuff with tickets
-    // had to extend it down here since we cant touch the original class
-    public static class UserExtensions
-    {
-        // checks if the password the user typed matches their account
-        public static bool ValidateLogin(this User user, string enteredPass)
-        {
-            return user.userPass == enteredPass; // simple check for now
-        }
-    }
-
     // handles all the user account stuff like logging in and registering
     // basically simulates what the sql database does on the c# side
     public class UserManager
@@ -323,6 +318,12 @@ public class Schedule
             allUsers.Add(user);
         }
 
+        // checks if the password the user typed matches their account
+        public bool validateLogin(User user, string enteredPass)
+        {
+            return user.userPass == enteredPass; // simple check for now
+        }
+
         // checks if a username and password match any user in the system
         // returns the user if found, null if not
         public User loginUser(string userName, string userPass)
@@ -330,7 +331,7 @@ public class Schedule
             // loop through all users and check if the username and password match
             foreach (var user in allUsers)
             {
-                if (user.userName == userName && user.userPass == userPass)
+                if (user.userName == userName && validateLogin(user, userPass))
                     return user; // found them
             }
             return null; // no match found
@@ -356,7 +357,6 @@ public class Schedule
         }
     }
 
-    // this is the core of the project brief tbh
     // takes a disruption and works out which journeys are affected and how late theyll be
     public class DelayPredictor
     {
@@ -482,7 +482,7 @@ public class Schedule
             return arrivals;
         }
 
-        // prints out the departure board like youd see at the station lol
+        // prints out the departure board like youd see at the station 
         public void displayBoard()
         {
             Console.WriteLine($"-- Departure Board: {boardStation.stationName} --");

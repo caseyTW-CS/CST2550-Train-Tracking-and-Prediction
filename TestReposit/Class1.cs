@@ -292,4 +292,213 @@ public class Schedule
     {
         isActive = false;
     }
+    // added methods to User to actually do stuff with tickets
+    // had to extend it down here since we cant touch the original class
+    public static class UserExtensions
+    {
+        // checks if the password the user typed matches their account
+        public static bool ValidateLogin(this User user, string enteredPass)
+        {
+            return user.userPass == enteredPass; // simple check for now
+        }
+    }
+
+    // handles all the user account stuff like logging in and registering
+    // basically simulates what the sql database does on the c# side
+    public class UserManager
+    {
+        //PROPERTIES
+        // stores all the users in the system
+        public List<User> allUsers { get; private set; }
+
+        //METHODS
+        public UserManager()
+        {
+            allUsers = new List<User>();
+        }
+
+        // adds a new user to the system
+        public void registerUser(User user)
+        {
+            allUsers.Add(user);
+        }
+
+        // checks if a username and password match any user in the system
+        // returns the user if found, null if not
+        public User loginUser(string userName, string userPass)
+        {
+            // loop through all users and check if the username and password match
+            foreach (var user in allUsers)
+            {
+                if (user.userName == userName && user.userPass == userPass)
+                    return user; // found them
+            }
+            return null; // no match found
+        }
+
+        // finds a user by their username
+        public User findUser(string userName)
+        {
+            foreach (var user in allUsers)
+            {
+                if (user.userName == userName)
+                    return user;
+            }
+            return null; // user doesnt exist
+        }
+
+        // removes a user from the system
+        public void deleteUser(string userName)
+        {
+            var user = findUser(userName);
+            if (user != null)
+                allUsers.Remove(user);
+        }
+    }
+
+    // this is the core of the project brief tbh
+    // takes a disruption and works out which journeys are affected and how late theyll be
+    public class DelayPredictor
+    {
+        //PROPERTIES
+        // keeps track of all active journeys so we can update them
+        public List<Journey> activeJourneys { get; private set; }
+
+        //METHODS
+        public DelayPredictor()
+        {
+            activeJourneys = new List<Journey>();
+        }
+
+        // add a journey to the tracker
+        public void addJourney(Journey journey)
+        {
+            activeJourneys.Add(journey);
+        }
+
+        // this is the main one - takes a disruption and pushes the delay
+        // through all the journeys it affects automatically
+        public void applyDisruption(Disruption disruption)
+        {
+            foreach (var journey in disruption.affectedJourneys)
+            {
+                // work out delay from the disruption duration
+                journey.updateDelay(disruption.estimatedDurationMinutes);
+            }
+        }
+
+        // works out which journeys a disruption at a specific station will affect
+        // e.g. if kings cross has a signal failure, find all trains going through it
+        public List<Journey> getAffectedJourneys(Station station)
+        {
+            var affected = new List<Journey>();
+            foreach (var journey in activeJourneys)
+            {
+                // check if any of the journeys stops include this station
+                foreach (var stop in journey.stops)
+                {
+                    if (stop.stopStation.stationName == station.stationName && !stop.hasPassed)
+                    {
+                        affected.Add(journey);
+                        break; // no need to check the rest of the stops for this journey
+                    }
+                }
+            }
+            return affected;
+        }
+
+        // returns all journeys that are currently delayed
+        public List<Journey> getDelayedJourneys()
+        {
+            var delayed = new List<Journey>();
+            foreach (var journey in activeJourneys)
+            {
+                if (journey.currentDelayMinutes > 0)
+                    delayed.Add(journey);
+            }
+            return delayed;
+        }
+
+        // returns a predicted arrival time for a journey based on current delay
+        public DateTime predictArrival(Journey journey)
+        {
+            return journey.getPredictedArrival();
+        }
+    }
+
+    // handles everything to do with the live departure board at a station
+    // basically what youd see on the screens at the station
+    public class DepartureBoard
+    {
+        //PROPERTIES
+        public Station boardStation { get; private set; }
+        // all journeys passing through this station
+        public List<Journey> stationJourneys { get; private set; }
+
+        //METHODS
+        public DepartureBoard(Station station)
+        {
+            boardStation = station;
+            stationJourneys = new List<Journey>();
+        }
+
+        // add a journey to this stations board
+        public void addJourney(Journey journey)
+        {
+            stationJourneys.Add(journey);
+        }
+
+        // returns all trains that havent departed yet, sorted by scheduled departure
+        public List<Journey> getUpcomingDepartures()
+        {
+            var upcoming = new List<Journey>();
+            foreach (var journey in stationJourneys)
+            {
+                // only show trains that havent left yet
+                if (journey.departureStation.stationName == boardStation.stationName
+                    && journey.actualDeparture == null)
+                {
+                    upcoming.Add(journey);
+                }
+            }
+            // sort by scheduled departure time so earliest is first
+            upcoming.Sort((a, b) => a.scheduledDeparture.CompareTo(b.scheduledDeparture));
+            return upcoming;
+        }
+
+        // returns all trains arriving at this station that havent arrived yet
+        public List<Journey> getUpcomingArrivals()
+        {
+            var arrivals = new List<Journey>();
+            foreach (var journey in stationJourneys)
+            {
+                if (journey.arrivalStation.stationName == boardStation.stationName
+                    && journey.actualArrival == null)
+                {
+                    arrivals.Add(journey);
+                }
+            }
+            arrivals.Sort((a, b) => a.scheduledArrival.CompareTo(b.scheduledArrival));
+            return arrivals;
+        }
+
+        // prints out the departure board like youd see at the station lol
+        public void displayBoard()
+        {
+            Console.WriteLine($"-- Departure Board: {boardStation.stationName} --");
+            Console.WriteLine($"{"Destination",-25} {"Scheduled",-12} {"Predicted",-12} {"Status",-20} {"Platform",-10}");
+            Console.WriteLine(new string('-', 80));
+
+            foreach (var journey in getUpcomingDepartures())
+            {
+                Console.WriteLine(
+                    $"{journey.arrivalStation.stationName,-25} " +
+                    $"{journey.scheduledDeparture.ToString("HH:mm"),-12} " +
+                    $"{journey.getPredictedArrival().ToString("HH:mm"),-12} " +
+                    $"{journey.getStatus(),-20} " +
+                    $"{journey.departureStation.stationPlatform,-10}"
+                );
+            }
+        }
+    }
 }

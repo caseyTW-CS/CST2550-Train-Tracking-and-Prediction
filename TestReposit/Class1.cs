@@ -4,7 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TestReposit;
-
+using System.Data.SqlClient;
+    
 namespace TestReposit
 {
     public class Class1
@@ -55,6 +56,26 @@ namespace TestReposit
             Longitude = newLongitude;
         }
     }
+    public class Station
+    {
+        //PROPERTIES
+        public string stationName { get; private set; }
+        //for storing the size of the platforms:
+        public string stationSize { get; private set; }
+        //for the platform the train will be stopping on:
+        public int stationPlatform { get; private set; }
+
+        public GeoCoords stationLocation { get; private set; }
+
+        //METHODS
+        public Station(string name, string size, int platform, GeoCoords location)
+        {
+            stationName = name;
+            stationSize = size;
+            stationPlatform = platform;
+            stationLocation = location;
+        }
+    }
     public class Train
     {
         //PROPERTIES
@@ -65,40 +86,19 @@ namespace TestReposit
         public string trainCompany { get; private set; }
         public int trainCarriages {  get; private set; }
         //will be used to store the names of each stop on the journey in a list:
-        public List<string> trainStops { get; private set; }
-        public string trainLatestStop { get ; private set; }
-        public string trainNextStop { get; private set; }
-
+        public List<Station> trainStops { get; private set; }
 
         //METHODS
-        public Train(string number, string type, string company, int carriages, string trainLatestStop, string trainNextStop)
+        public Train(string number, string type, string company, int carriages)
         {
             trainNumber = number;
             trainType = type;
             trainCompany = company;
             trainCarriages = carriages;
-            trainStops = new List<string>();
-            this.trainLatestStop = trainLatestStop;
-            this.trainNextStop = trainNextStop;
+            trainStops = new List<Station>();
         }
     }
-    public class Station
-    {
-        //PROPERTIES
-        public string stationName { get; private set;  }
-        //for storing the size of the platforms:
-        public string stationSize { get; private set; }
-        //for the platform the train will be stopping on:
-        public int stationPlatform { get; private set; }
-        
-        //METHODS
-        public Station (string name, string size, int platform)
-        {
-            stationName = name;
-            stationSize = size;
-            stationPlatform = platform;
-        }
-    }
+    
 }
 // represents a single ticket purchased by a user
 // i made this a class instead of just a string so we can actually store useful info
@@ -502,6 +502,7 @@ public class Schedule
         }
     }
 }
+
 // stores average speeds for different train types
 // useful for estimating journey times and predicting delays
 public class TrainSpeed
@@ -567,3 +568,24 @@ public class TrainSpeedManager
         return speed.estimateJourneyTime(distanceMiles);
     }
 }
+public class Program
+{
+    public void Main(string[] args)
+    {
+        //Server connection string
+        string connectionString = "Server=trainserver.database.windows.net;Initial Catalog=Users;User ID=CT855;Password=TrainPredicPass123;Encrypt=True;";
+
+
+        Station example1 = new Station(
+            "Example station 1",
+            "Regular",
+            2,
+            new GeoCoords(50.0000, 100.0000)
+        );
+
+        Train train1 = new Train("T001", "Commuter", "FakeBrand", 8);
+
+        train1.trainStops.Add(example1);
+    }
+}
+

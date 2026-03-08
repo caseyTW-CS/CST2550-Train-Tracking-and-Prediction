@@ -32,6 +32,9 @@
 CREATE DATABASE Users;
 GO
 
+USE Users;
+GO
+
 --Create Info table
 CREATE TABLE Info (
 	UserID INT IDENTITY(1,1) PRIMARY KEY,
@@ -39,7 +42,7 @@ CREATE TABLE Info (
 	userPass NVARCHAR(20) NOT NULL,
 	userAge SMALLINT NOT NULL,
 	userEmail NVARCHAR(100) NULL,
-	userPhone NVARCHAR(20) NOT NULL
+	userPhone NVARCHAR(20) NOT NULL,
 	userRailcard NVARCHAR(50) NULL
 );
 GO
@@ -51,68 +54,75 @@ VALUES
 	('00000002', 'Jane Smith', 'Pass456', '47', 'jaSmith@email.com', '079-293-4444');
 GO
 
+
+
+--=====================================
+-- COMMENTED OUT FOR TESTING
+--====================================
+
+
 --Stores all the train services we track
-CREATE TABLE Train (
-	trainID INT IDENTITY(1,1) PRIMARY KEY,
-	trainNumber NVARCHAR(20) NOT NULL,
+--CREATE TABLE Train (
+--	trainID INT IDENTITY(1,1) PRIMARY KEY,
+--	trainNumber NVARCHAR(20) NOT NULL,
 	--e.g. commuter, freight etc:
-	trainType NVARCHAR(50) NOT NULL,
+--	trainType NVARCHAR(50) NOT NULL,
 	--e.g. thameslink, great northern:
-	trainCompany NVARCHAR(100) NOT NULL,
-	trainCarriages SMALLINT NOT NULL
-);
-GO
+--	trainCompany NVARCHAR(100) NOT NULL,
+--	trainCarriages SMALLINT NOT NULL
+--);
+--GO
 
 --Sample data:
-INSERT INTO Train (trainNumber, trainType, trainCompany, trainCarriages)
-VALUES
-	('TL1234', 'Commuter', 'Thameslink', 8),
-	('GN5678', 'Commuter', 'Great Northern', 6);
-GO
+--INSERT INTO Train (trainNumber, trainType, trainCompany, trainCarriages)
+--VALUES
+--	('TL1234', 'Commuter', 'Thameslink', 8),
+--	('GN5678', 'Commuter', 'Great Northern', 6);
+--GO
 
 --Stores all the stations in the system
-CREATE TABLE Station (
-	stationID INT IDENTITY(1,1) PRIMARY KEY,
-	stationName NVARCHAR(100) NOT NULL,
+--CREATE TABLE Station (
+--	stationID INT IDENTITY(1,1) PRIMARY KEY,
+--	stationName NVARCHAR(100) NOT NULL,
 	--for storing the size of the platforms:
-	stationSize NVARCHAR(20) NOT NULL,
+--	stationSize NVARCHAR(20) NOT NULL,
 	--for the platform the train will be stopping on:
-	stationPlatform SMALLINT NOT NULL
-);
-GO
+--	stationPlatform SMALLINT NOT NULL
+--);
+--GO
 
 --Sample data:
-INSERT INTO Station (stationName, stationSize, stationPlatform)
-VALUES
-	('London Kings Cross', 'Large', 5),
-	('Cambridge', 'Medium', 2),
-	('Stevenage', 'Small', 1);
-GO
+--INSERT INTO Station (stationName, stationSize, stationPlatform)
+--VALUES
+--	('London Kings Cross', 'Large', 5),
+--	('Cambridge', 'Medium', 2),
+--	('Stevenage', 'Small', 1);
+--GO
 
 --Stores each journey a train makes, links trains to their departure/arrival stations
-CREATE TABLE Journey (
-	journeyID INT IDENTITY(1,1) PRIMARY KEY,
+--CREATE TABLE Journey (
+--	journeyID INT IDENTITY(1,1) PRIMARY KEY,
 	--which train is doing this journey:
-	trainID INT NOT NULL FOREIGN KEY REFERENCES Train(trainID),
+--	trainID INT NOT NULL FOREIGN KEY REFERENCES Train(trainID),
 	--where its coming from and going to:
-	departureStationID INT NOT NULL FOREIGN KEY REFERENCES Station(stationID),
-	arrivalStationID INT NOT NULL FOREIGN KEY REFERENCES Station(stationID),
+--	departureStationID INT NOT NULL FOREIGN KEY REFERENCES Station(stationID),
+--	arrivalStationID INT NOT NULL FOREIGN KEY REFERENCES Station(stationID),
 	--what the timetable says:
-	scheduledDeparture DATETIME NOT NULL,
-	scheduledArrival DATETIME NOT NULL,
+--	scheduledDeparture DATETIME NOT NULL,
+--	scheduledArrival DATETIME NOT NULL,
 	--what actually happened or our prediction:
-	actualDeparture DATETIME NULL,
-	actualArrival DATETIME NULL,
+--	actualDeparture DATETIME NULL,
+--	actualArrival DATETIME NULL,
 	--how many minutes late the train is, starts at 0 obviously:
-	currentDelayMinutes SMALLINT DEFAULT 0,
+--	currentDelayMinutes SMALLINT DEFAULT 0,
 	--on time, slight delay, delayed etc:
-	journeyStatus NVARCHAR(50) DEFAULT 'On Time'
-);
-GO
+--	journeyStatus NVARCHAR(50) DEFAULT 'On Time'
+--);
+--GO
 
 --Sample data:
-INSERT INTO Journey (trainID, departureStationID, arrivalStationID, scheduledDeparture, scheduledArrival, currentDelayMinutes, journeyStatus)
-VALUES
-	(1, 1, 2, '2026-03-05 08:00:00', '2026-03-05 09:10:00', 0, 'On Time'),
-	(2, 2, 3, '2026-03-05 09:00:00', '2026-03-05 09:30:00', 5, 'Slight Delay (5 mins)');
-GO
+--INSERT INTO Journey (trainID, departureStationID, arrivalStationID, scheduledDeparture, scheduledArrival, currentDelayMinutes, journeyStatus)
+--VALUES
+--	(1, 1, 2, '2026-03-05 08:00:00', '2026-03-05 09:10:00', 0, 'On Time'),
+--	(2, 2, 3, '2026-03-05 09:00:00', '2026-03-05 09:30:00', 5, 'Slight Delay (5 mins)');
+--GO

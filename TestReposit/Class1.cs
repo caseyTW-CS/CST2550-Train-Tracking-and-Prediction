@@ -503,71 +503,6 @@ public class Schedule
     }
 }
 
-// stores average speeds for different train types
-// useful for estimating journey times and predicting delays
-public class TrainSpeed
-{
-    //PROPERTIES
-    public string trainType { get; private set; }
-    // average speed in mph
-    public int averageSpeed { get; private set; }
-    // top speed the train can do in mph
-    public int topSpeed { get; private set; }
-
-    //METHODS
-    public TrainSpeed(string type, int avgSpeed, int maxSpeed)
-    {
-        trainType = type;
-        averageSpeed = avgSpeed;
-        topSpeed = maxSpeed;
-    }
-
-    // works out how long a journey will take based on distance in miles
-    public double estimateJourneyTime(double distanceMiles)
-    {
-        // time = distance / speed, gives us hours so we times by 60 for minutes
-        return (distanceMiles / averageSpeed) * 60;
-    }
-}
-
-// manages all the different train type speeds in one place
-public class TrainSpeedManager
-{
-    //PROPERTIES
-    public List<TrainSpeed> trainSpeeds { get; private set; }
-
-    //METHODS
-    public TrainSpeedManager()
-    {
-        trainSpeeds = new List<TrainSpeed>();
-        // pre-load with realistic average speeds for each train type
-        trainSpeeds.Add(new TrainSpeed("Commuter", 50, 100));
-        trainSpeeds.Add(new TrainSpeed("Express", 90, 125));
-        trainSpeeds.Add(new TrainSpeed("Freight", 40, 75));
-        trainSpeeds.Add(new TrainSpeed("High Speed", 150, 200));
-        trainSpeeds.Add(new TrainSpeed("Regional", 60, 90));
-    }
-
-    // finds the speed info for a specific train type
-    public TrainSpeed getSpeedForType(string trainType)
-    {
-        foreach (var speed in trainSpeeds)
-        {
-            if (speed.trainType == trainType)
-                return speed;
-        }
-        return null; // train type not found
-    }
-
-    // works out how long a journey will take given a train type and distance
-    public double estimateJourneyTime(string trainType, double distanceMiles)
-    {
-        var speed = getSpeedForType(trainType);
-        if (speed == null)
-            return -1; // couldnt find that train type
-        return speed.estimateJourneyTime(distanceMiles);
-    }
-}
 public class Program
 {
     public void Main(string[] args)
@@ -588,4 +523,3 @@ public class Program
         train1.trainStops.Add(example1);
     }
 }
-

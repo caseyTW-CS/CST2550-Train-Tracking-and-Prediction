@@ -4,7 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TestReposit;
-
+using System.Data.SqlClient;
+    
 namespace TestReposit
 {
     public class Class1
@@ -506,6 +507,10 @@ public class Program
 {
     public void Main(string[] args)
     {
+        //Server connection string
+        string connectionString = "Server=trainserver.database.windows.net;Initial Catalog=Users;User ID=CT855;Password=TrainPredicPass123;Encrypt=True;";
+
+
         Station example1 = new Station(
             "Example station 1",
             "Regular",

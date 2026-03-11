@@ -36,19 +36,19 @@ USE Users;
 GO
 
 --Create Info table
-CREATE TABLE Info (
+CREATE TABLE userInfo (
 	UserID INT IDENTITY(1,1) PRIMARY KEY,
 	userName NVARCHAR(20) NOT NULL,
 	userPass NVARCHAR(20) NOT NULL,
 	userAge SMALLINT NOT NULL,
 	userEmail NVARCHAR(100) NULL,
 	userPhone NVARCHAR(20) NOT NULL,
-	userRailcard NVARCHAR(50) NULL
+	--userRailcard NVARCHAR(50) NULL
 );
 GO
 
 --Sample data:
-INSERT INTO Info (userID, userName, userPass, userAge, userEmail, userPhone)
+INSERT INTO userInfo (userID, userName, userPass, userAge, userEmail, userPhone)
 VALUES
 	('00000001', 'John Smith', 'Pass123', '45', 'joSmith@email.com', '079-203-6522'),
 	('00000002', 'Jane Smith', 'Pass456', '47', 'jaSmith@email.com', '079-293-4444');

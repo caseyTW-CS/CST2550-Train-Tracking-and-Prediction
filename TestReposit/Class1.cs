@@ -9,10 +9,6 @@ using System.Data.SqlClient;
     
 namespace TestReposit
 {
-    public class Class1
-    {
-        
-
     public class User
     {
         //PROPERTIES
@@ -81,50 +77,21 @@ namespace TestReposit
         //PROPERTIES
         public string trainNumber {  get; private set; }
         //referring to commuter, freight, etc:
-        public string trainType { get; private set; }
-        //e.g. thameslink:
         public string trainCompany { get; private set; }
         public int trainCarriages {  get; private set; }
         //will be used to store the names of each stop on the journey in a list:
         public List<Station> trainStops { get; private set; }
 
         //METHODS
-        public Train(string number, string type, string company, int carriages)
+        public Train(string number, string company, int carriages)
         {
             trainNumber = number;
-            trainType = type;
             trainCompany = company;
             trainCarriages = carriages;
             trainStops = new List<Station>();
         }
     }
     
-}
-// represents a single ticket purchased by a user
-// i made this a class instead of just a string so we can actually store useful info
-public class Ticket
-{
-    //PROPERTIES
-    public string ticketId { get; private set; }
-    public string ticketType { get; private set; } // e.g. single, return, season
-    public decimal ticketPrice { get; private set; }
-    public string ticketClass { get; private set; } // first or standard
-    public string railcardApplied { get; private set; } // which railcard was used if any
-    public DateTime purchaseDate { get; private set; }
-    // the journey this ticket is for
-    public Journey ticketJourney { get; private set; }
-
-    //METHODS
-    public Ticket(string id, string type, decimal price, string ticketClass, string railcard, Journey journey)
-    {
-        ticketId = id;
-        ticketType = type;
-        ticketPrice = price;
-        this.ticketClass = ticketClass;
-        railcardApplied = railcard;
-        purchaseDate = DateTime.Now; // just set it to now when the ticket is created
-        ticketJourney = journey;
-    }
 }
 
 // this is probably the most important class for the project
@@ -507,8 +474,20 @@ public class Program
 {
     public void Main(string[] args)
     {
-        //Server connection string
-        string connectionString = "Server=trainserver.database.windows.net;Initial Catalog=Users;User ID=CT855;Password=TrainPredicPass123;Encrypt=True;";
+        //Database connection strings:
+        //Users connection string
+        string userConnectionString = "Server=trainserver.database.windows.net;Initial Catalog=Users;User ID=CT855;Password=TrainPredicPass123;Encrypt=True;";
+
+        //Users INSERT query
+        string query = @"INSERT INTO userInfo
+            (userName, userPass, userAge, userEmail, userPhone) 
+            VALUES
+            (@name, @pass, @age, @email, @phone)";
+
+        using (SqlConnection conn = new SqlConnection(userConnectionString))
+        {
+            SqlCommand cmd = new SqlCommand(query, conn);
+        }
 
 
         Station example1 = new Station(
@@ -529,8 +508,6 @@ public class Program
 public class TrainSpeed
 {
     //PROPERTIES
-    public string trainType { get; private set; }
-    // average speed in mph
     public int averageSpeed { get; private set; }
     // top speed the train can do in mph
     public int topSpeed { get; private set; }

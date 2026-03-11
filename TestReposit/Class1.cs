@@ -55,6 +55,32 @@ namespace TestReposit
             Latitude = newLatitude;
             Longitude = newLongitude;
         }
+
+        // Haversine formula - calculates straight-line distance between
+        // two sets of coordinates on the Earth's surface, returns miles
+        public double distanceTo(GeoCoords other)
+        {
+            const double EarthRadiusMiles = 3958.8;
+
+            double lat1 = toRadians(this.Latitude);
+            double lat2 = toRadians(other.Latitude);
+            double deltaLat = toRadians(other.Latitude - this.Latitude);
+            double deltaLon = toRadians(other.Longitude - this.Longitude);
+
+            double a = Math.Sin(deltaLat / 2) * Math.Sin(deltaLat / 2) +
+                       Math.Cos(lat1) * Math.Cos(lat2) *
+                       Math.Sin(deltaLon / 2) * Math.Sin(deltaLon / 2);
+
+            double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+
+            return EarthRadiusMiles * c;
+        }
+
+        // helper to convert degrees to radians
+        private double toRadians(double degrees)
+        {
+            return degrees * (Math.PI / 180);
+        }
     }
     public class Station
     {
@@ -505,22 +531,41 @@ public class Schedule
 
 public class Program
 {
-    public void Main(string[] args)
+    public static void Main(string[] args)
     {
-        //Server connection string
+        // Server connection string - kept from before
         string connectionString = "Server=trainserver.database.windows.net;Initial Catalog=Users;User ID=CT855;Password=TrainPredicPass123;Encrypt=True;";
 
-
-        Station example1 = new Station(
-            "Example station 1",
-            "Regular",
-            2,
-            new GeoCoords(50.0000, 100.0000)
+        // create two real stations with actual coordinates
+        Station kingsCross = new Station(
+            "London Kings Cross", "Large", 5,
+            new GeoCoords(51.5308, -0.1238)
         );
 
-        Train train1 = new Train("T001", "Commuter", "FakeBrand", 8);
+        Station cambridge = new Station(
+            "Cambridge", "Medium", 2,
+            new GeoCoords(52.1936, 0.1377)
+        );
 
-        train1.trainStops.Add(example1);
+        Station stevenage = new Station(
+            "Stevenage", "Small", 1,
+            new GeoCoords(51.9020, -0.2076)
+        );
+
+        // create the speed manager
+        TrainSpeedManager speedManager = new TrainSpeedManager();
+
+        // test the journey time calculations
+        string result1 = speedManager.calculateTimeBetweenStations(kingsCross, cambridge, "Commuter");
+        string result2 = speedManager.calculateTimeBetweenStations(kingsCross, stevenage, "Commuter");
+        string result3 = speedManager.calculateTimeBetweenStations(kingsCross, cambridge, "Express");
+
+        Console.WriteLine("Journey Time Estimates:");
+        Console.WriteLine($"Kings Cross to Cambridge (Commuter): {result1}");
+        Console.WriteLine($"Kings Cross to Stevenage (Commuter): {result2}");
+        Console.WriteLine($"Kings Cross to Cambridge (Express):  {result3}");
+
+        Console.ReadLine(); // keeps the console window open
     }
 }
 
@@ -558,34 +603,55 @@ public class TrainSpeedManager
     public List<TrainSpeed> trainSpeeds { get; private set; }
 
     //METHODS
-    public TrainSpeedManager()
+    public class TrainSpeedManager
     {
-        trainSpeeds = new List<TrainSpeed>();
-        // pre-load with realistic average speeds for each train type
-        trainSpeeds.Add(new TrainSpeed("Commuter", 50, 100));
-        trainSpeeds.Add(new TrainSpeed("Express", 90, 125));
-        trainSpeeds.Add(new TrainSpeed("Freight", 40, 75));
-        trainSpeeds.Add(new TrainSpeed("High Speed", 150, 200));
-        trainSpeeds.Add(new TrainSpeed("Regional", 60, 90));
-    }
+        public List<TrainSpeed> trainSpeeds { get; private set; }
 
-    // finds the speed info for a specific train type
-    public TrainSpeed getSpeedForType(string trainType)
-    {
-        foreach (var speed in trainSpeeds)
+        public TrainSpeedManager()
         {
-            if (speed.trainType == trainType)
-                return speed;
+            trainSpeeds = new List<TrainSpeed>();
+            trainSpeeds.Add(new TrainSpeed("Commuter", 50, 100));
+            trainSpeeds.Add(new TrainSpeed("Express", 90, 125));
+            trainSpeeds.Add(new TrainSpeed("Freight", 40, 75));
+            trainSpeeds.Add(new TrainSpeed("High Speed", 150, 200));
+            trainSpeeds.Add(new TrainSpeed("Regional", 60, 90));
         }
-        return null; // train type not found
-    }
 
-    // works out how long a journey will take given a train type and distance
-    public double estimateJourneyTime(string trainType, double distanceMiles)
-    {
-        var speed = getSpeedForType(trainType);
-        if (speed == null)
-            return -1; // couldnt find that train type
-        return speed.estimateJourneyTime(distanceMiles);
+        public TrainSpeed getSpeedForType(string trainType)
+        {
+            foreach (var speed in trainSpeeds)
+            {
+                if (speed.trainType == trainType)
+                    return speed;
+            }
+            return null;
+        }
+
+        public double estimateJourneyTime(string trainType, double distanceMiles)
+        {
+            var speed = getSpeedForType(trainType);
+            if (speed == null)
+                return -1;
+            return speed.estimateJourneyTime(distanceMiles);
+        }
+
+        // NEW METHOD - calculates how long a train will take between two stations
+        public string calculateTimeBetweenStations(Station stationA, Station stationB, string trainType)
+        {
+            double distanceMiles = stationA.stationLocation.distanceTo(stationB.stationLocation);
+
+            TrainSpeed speed = getSpeedForType(trainType);
+            if (speed == null)
+                return $"Error: train type '{trainType}' not found.";
+
+            double totalMinutes = speed.estimateJourneyTime(distanceMiles);
+
+            int hours = (int)totalMinutes / 60;
+            int minutes = (int)totalMinutes % 60;
+
+            if (hours > 0)
+                return $"{hours}h {minutes}m (approx {Math.Round(distanceMiles, 1)} miles)";
+            else
+                return $"{minutes}m (approx {Math.Round(distanceMiles, 1)} miles)";
+        }
     }
-}

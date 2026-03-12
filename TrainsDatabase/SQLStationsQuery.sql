@@ -28,20 +28,10 @@
 -- ===================================================================================================================================
 
  
---Create trains database
-CREATE DATABASE Trains;
-GO
+ CREATE DATABASE Stations;
+ GO
 
-USE Trains;
-Go
+ USE Stations;
+ GO
 
---Create Info table
-CREATE TABLE trainsInfo (
-	trainNumber INT IDENTITY(1,1) PRIMARY KEY,
-	trainType NVARCHAR(20) NOT NULL,
-	trainCompany NVARCHAR(20) NOT NULL,
-	trainCarriges SMALLINT NOT NULL,
-	trainLatestStop NVARCHAR(100) NULL,
-	trainNextStop NVARCHAR(20) NOT NULL
-);
-GO
+

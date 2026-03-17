@@ -4,7 +4,52 @@
     ViewData["Title"] = "Home page";
 }
 
+<!-- main container for the whole page -->
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+
+    <!-- header section -->
+    <h1 class="display-4">Line Tracker</h1>
+    <p class="lead">Track trains, check arrivals and plan your journey on our train app</p>
+
+    <!-- quick action buttons -->
+    <div class="mt-4">
+        <a href="/TrainTracker" class="btn btn-primary btn-lg m-2">Track a Train</a>
+        <a href="/Departures" class="btn btn-secondary btn-lg m-2">Departures & Arrivals</a>
+        <a href="/Account" class="btn btn-outline-primary btn-lg m-2">My Account</a>
+    </div>
+
+    <!-- status section showing if there are any delays -->
+    <div class="mt-5">
+        <h3>Live Service Status</h3>
+        <div class="alert alert-success mt-3">
+            <!-- this will eventually be dynamic based on real delay data -->
+            Elizabeth Line: Good Service
+        </div>
+    </div>
+
+    <!-- quick info cards at the bottom -->
+    <div class="row mt-5">
+        <div class="col-md-4">
+            <div class="card p-3">
+                <h5>Train Positions</h5>
+                <p>See where every train is right now on the Elizabeth Line</p>
+                <a href="/TrainTracker" class="btn btn-primary">View Trains</a>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card p-3">
+                <h5>Departures Board</h5>
+                <p>Check upcoming arrivals and departures at any station</p>
+                <a href="/Departures" class="btn btn-primary">View Board</a>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card p-3">
+                <h5>Delay Alerts</h5>
+                <p>Get notified about disruptions and delays on your route</p>
+                <a href="/Alerts" class="btn btn-primary">View Alerts</a>
+            </div>
+        </div>
+    </div>
+
 </div>

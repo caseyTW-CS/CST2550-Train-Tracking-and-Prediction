@@ -42,6 +42,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Class1.cs" />
+    <Compile Include="Models\WebsitePage\Pages\Account.cshtml.cs" />
+    <Compile Include="Models\WebsitePage\Pages\Alerts.cshtml.cs" />
+    <Compile Include="Models\WebsitePage\Pages\Departures.cshtml.cs" />
+    <Compile Include="Models\WebsitePage\Pages\Login.cshtml.cs" />
+    <Compile Include="Models\WebsitePage\Pages\TrainTracker.cshtml.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

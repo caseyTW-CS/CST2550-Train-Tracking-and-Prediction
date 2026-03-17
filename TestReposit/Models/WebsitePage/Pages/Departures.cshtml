@@ -1,0 +1,62 @@
+@page
+@model TestReposit.Models.WebsitePage.Pages.DeparturesModel
+@{
+    ViewData["Title"] = "Departures & Arrivals";
+}
+
+<!-- page header -->
+<div class="text-center mb-4">
+    <h1 class="display-4">Departures & Arrivals</h1>
+    <p class="lead">Check upcoming trains at any Elizabeth Line station</p>
+</div>
+
+<!-- station search bar -->
+<div class="row justify-content-center mb-4">
+    <div class="col-md-6">
+        <div class="input-group">
+            <input type="text" class="form-control form-control-lg" placeholder="Search for a station e.g. Paddington" />
+            <button class="btn btn-primary btn-lg">Search</button>
+        </div>
+    </div>
+</div>
+
+<!-- departures table -->
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <h3 class="mb-3">Departures</h3>
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Destination</th>
+                    <th>Scheduled</th>
+                    <th>Predicted</th>
+                    <th>Platform</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="5" class="text-center text-muted">Search for a station to see departures</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3 class="mt-5 mb-3">Arrivals</h3>
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Origin</th>
+                    <th>Scheduled</th>
+                    <th>Predicted</th>
+                    <th>Platform</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="5" class="text-center text-muted">Search for a station to see arrivals</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace TestReposit.Models.WebsitePage.Pages
 {
-    internal class Account
+    public class AccountModel : PageModel
     {
+        public void OnGet()
+        {
+            // will eventually load the users settings and favourites
+        }
     }
 }

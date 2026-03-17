@@ -41,7 +41,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
     <Compile Include="Models\WebsitePage\Pages\Account.cshtml.cs" />
     <Compile Include="Models\WebsitePage\Pages\Alerts.cshtml.cs" />
     <Compile Include="Models\WebsitePage\Pages\Departures.cshtml.cs" />

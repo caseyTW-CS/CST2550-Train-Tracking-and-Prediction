@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace TestReposit.Models.WebsitePage.Pages
 {
-    internal class Login
+    public class LoginModel : PageModel
     {
+        public void OnGet()
+        {
+            // handles the login page loading
+        }
     }
 }

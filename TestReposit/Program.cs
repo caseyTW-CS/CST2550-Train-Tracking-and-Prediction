@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data.SqlClient;
 
 namespace TestReposit
 {
@@ -10,13 +11,27 @@ namespace TestReposit
             string connectionString =
             "Server=trainserver.database.windows.net;Initial Catalog=Users;User ID=CT855;Password=TrainPredicPass123;Encrypt=True;";
 
-            Console.WriteLine("Train Prediction System Initialised.");
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
 
-            // data loading from SQL will be implemented here later
-            // once stations, trains and schedules are imported,
-            // prediction and journey calculations will run
+                string query = "SELECT userID, userName FROM userInfo";
 
-            Console.ReadLine();
+                SqlCommand cmd = new SqlCommand(query, conn);
+
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    Console.WriteLine($"ID: {reader["userID"]}, Name: {reader["userName"]}");
+                }
+
+                // data loading from SQL will be implemented here later
+                // once stations, trains and schedules are imported,
+                // prediction and journey calculations will run
+
+                Console.ReadLine();
+            }
         }
     }
 }

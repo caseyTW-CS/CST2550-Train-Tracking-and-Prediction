@@ -1,8 +1,66 @@
 ﻿@page
-@model PrivacyModel
+@model TestReposit.Models.WebsitePage.Pages.PrivacyModel
 @{
     ViewData["Title"] = "Privacy Policy";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<!-- page header -->
+<div class="text-center mb-4">
+    <h1 class="display-4">Privacy Policy</h1>
+    <p class="lead">How LineTrack handles your data</p>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+
+        <!-- what data we collect -->
+        <div class="card p-4 mb-4">
+            <h3 class="mb-3">What Data We Collect</h3>
+            <p>When you create a LineTrack account we collect the following information:</p>
+            <ul>
+                <li>Username</li>
+                <li>Password (stored securely)</li>
+                <li>Age</li>
+                <li>Email address</li>
+                <li>Phone number</li>
+                <li>Railcard information</li>
+            </ul>
+        </div>
+
+        <!-- how we use your data -->
+        <div class="card p-4 mb-4">
+            <h3 class="mb-3">How We Use Your Data</h3>
+            <p>We use your data to:</p>
+            <ul>
+                <li>Manage your account and login</li>
+                <li>Recommend suitable ticket types and railcards based on your age</li>
+                <li>Send you delay alerts for journeys you are travelling on</l i>
+                <li>Save your favourite stations and recent searches</li>
+            </ul>
+        </div>
+
+        <!-- data storage -->
+        <div class="card p-4 mb-4">
+            <h3 class="mb-3">How We Store Your Data</h3>
+            <p>Your data is stored securely in our database. Passwords are never stored in plain text. We do not share your data with any third parties.</p>
+        </div>
+
+        <!-- your rights -->
+        <div class="card p-4 mb-4">
+            <h3 class="mb-3">Your Rights</h3>
+            <p>You have the right to:</p>
+            <ul>
+                <li>Access the data we hold about you</li>
+                <li>Request your data to be deleted</li>
+                <li>Update your personal information at any time through your account page</li>
+            </ul>
+        </div>
+
+        <!-- contact -->
+        <div class="card p-4">
+            <h3 class="mb-3">Contact Us</h3>
+            <p>If you have any questions about how we handle your data please contact us at <a href="mailto:support@linetrack.com">support@linetrack.com</a></p>
+        </div>
+
+    </div>
+</div>

@@ -7,11 +7,12 @@ namespace TestReposit
     {
         public static void Main(string[] args)
         {
-            // Server connection string - used when importing data from SQL
-            string connectionString =
-            "Server=trainserver.database.windows.net;Initial Catalog=Users;User ID=CT855;Password=TrainPredicPass123;Encrypt=True;";
+            //Server connection string - used when importing data from SQL
+            //Users:
+            string connectionStringUsers = 
+                "Server=trainserver.database.windows.net;Initial Catalog=Users;User ID=CT855;Password=TrainPredicPass123;Encrypt=True;";
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            using (SqlConnection conn = new SqlConnection(connectionStringUsers))
             {
                 conn.Open();
 
@@ -31,6 +32,26 @@ namespace TestReposit
                 // prediction and journey calculations will run
 
                 Console.ReadLine();
+            }
+
+            //Stations:
+            string connectionStringStations =
+                "Server=trainserver.database.windows.net;Initial Catalog=Stations;User ID=CT855;Password=TrainPredicPass123;Encrypt=True;";
+
+            using (SqlConnection conn = new SqlConnection(connectionStringStations))
+            {
+                conn.Open();
+
+                string query = "SELECT StationName FROM stationInfo";
+
+                SqlCommand cmd = new SqlCommand(@query, conn);
+
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    Console.WriteLine($"Name: {reader["StationName"]}");
+                }
             }
         }
     }

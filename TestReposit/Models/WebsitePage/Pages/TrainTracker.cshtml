@@ -1,0 +1,83 @@
+@page
+@model TestReposit.Models.WebsitePage.Pages.TrainTrackerModel
+@{
+    ViewData["Title"] = "Train Tracker";
+}
+
+<!-- page header -->
+<div class="text-center mb-4">
+    <h1 class="display-4">Train Tracker</h1>
+    <p class="lead">See where any Elizabeth Line train is right now</p>
+</div>
+
+<!-- search bar -->
+<div class="row justify-content-center mb-4">
+    <div class="col-md-6">
+        <div class="input-group">
+            <!-- user types the train number here -->
+            <input type="text" class="form-control form-control-lg" placeholder="Enter train number e.g. TL1234" />
+            <button class="btn btn-primary btn-lg">Track</button>
+        </div>
+    </div>
+</div>
+
+<!-- train position info -->
+<div class="row justify-content-center">
+    <div class="col-md-8">
+
+        <!-- current position card -->
+        <div class="card p-4 mb-4">
+            <h3 class="mb-3">Current Position</h3>
+            <table class="table">
+                <tr>
+                    <td class="text-muted">Train Number</td>
+                    <td class="text-center text-muted">Search for a train to see its position</td>
+                </tr>
+                <tr>
+                    <td class="text-muted">Last Station</td>
+                    <td>--</td>
+                </tr>
+                <tr>
+                    <td class="text-muted">Next Station</td>
+                    <td>--</td>
+                </tr>
+                <tr>
+                    <td class="text-muted">Minutes Until Next Station</td>
+                    <td>--</td>
+                </tr>
+                <tr>
+                    <td class="text-muted">Current Speed</td>
+                    <td>--</td>
+                </tr>
+                <tr>
+                    <td class="text-muted">Status</td>
+                    <td>--</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- predicted arrival card -->
+        <div class="card p-4">
+            <h3 class="mb-3">Predicted Arrival</h3>
+            <table class="table">
+                <tr>
+                    <td class="text-muted">Final Destination</td>
+                    <td>--</td>
+                </tr>
+                <tr>
+                    <td class="text-muted">Scheduled Arrival</td>
+                    <td>--</td>
+                </tr>
+                <tr>
+                    <td class="text-muted">Predicted Arrival</td>
+                    <td>--</td>
+                </tr>
+                <tr>
+                    <td class="text-muted">Delay</td>
+                    <td>--</td>
+                </tr>
+            </table>
+        </div>
+
+    </div>
+</div>

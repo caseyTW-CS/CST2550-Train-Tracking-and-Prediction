@@ -1,0 +1,42 @@
+@page
+@model TestReposit.Models.WebsitePage.Pages.LoginModel
+@{
+    ViewData["Title"] = "Login";
+}
+
+<!-- page header -->
+<div class="text-center mb-4">
+    <h1 class="display-4">Login</h1>
+    <p class="lead">Sign in to your LineTrack account</p>
+</div>
+
+<!-- login form -->
+<div class="row justify-content-center">
+    <div class="col-md-4">
+        <div class="card p-4">
+
+            <!-- username field -->
+            <div class="mb-3">
+                <label class="form-label">Username</label>
+                <input type="text" class="form-control" placeholder="Enter your username" />
+            </div>
+
+            <!-- password field -->
+            <div class="mb-3">
+                <label class="form-label">Password</label>
+                <input type="password" class="form-control" placeholder="Enter your password" />
+            </div>
+
+            <!-- login button -->
+            <div class="d-grid">
+                <button class="btn btn-primary btn-lg">Login</button>
+            </div>
+
+            <!-- register link -->
+            <div class="text-center mt-3">
+                <p class="text-muted">Don't have an account? <a href="#">Register here</a></p>
+            </div>
+
+        </div>
+    </div>
+</div>

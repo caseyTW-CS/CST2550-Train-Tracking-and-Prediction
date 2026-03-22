@@ -1,13 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+﻿using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace WebsitePage.Pages
+namespace TestReposit.Models.WebsitePage.Pages
 {
     public class PrivacyModel : PageModel
     {
         public void OnGet()
         {
+            // loads the privacy policy page
         }
     }
-
 }

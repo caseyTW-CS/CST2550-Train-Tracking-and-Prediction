@@ -5,7 +5,7 @@
 }
 
 <style>
-    /* hides the default container padding for this page */
+    /* main wrapper for the two panels */
     .login-wrapper {
         display: flex;
         height: 80vh;
@@ -16,9 +16,9 @@
         margin: 0 auto;
     }
 
-    /* left green panel */
+    /* left navy blue panel */
     .login-left {
-        background-color: #5bc4a0;
+        background-color: #4B4E6D;
         color: white;
         width: 40%;
         display: flex;
@@ -39,7 +39,7 @@
         padding: 40px;
     }
 
-    /* toggle arrow button at the bottom */
+    /* arrow button to switch between login and register */
     .toggle-btn {
         background: none;
         border: 2px solid white;
@@ -54,18 +54,27 @@
 
     .toggle-btn:hover {
         background-color: white;
-        color: #5bc4a0;
+        color: #4B4E6D;
     }
 
+    /* input fields with a light blue tint */
     .form-control {
-        background-color: #f0faf5;
+        background-color: #f0f4fa;
         border: none;
         padding: 12px;
         margin-bottom: 12px;
     }
 
+    /* navy blue heading on the right panel */
+    .form-title {
+        color: #4B4E6D;
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+
+    /* submit button */
     .submit-btn {
-        background-color: #5bc4a0;
+        background-color: #4B4E6D;
         color: white;
         border: none;
         padding: 12px;
@@ -77,14 +86,16 @@
         cursor: pointer;
     }
 
+    /* hover turns mint green to contrast with navy */
     .submit-btn:hover {
-        background-color: #3da882;
+        background-color: #84DCC6;
+        color: #4B4E6D;
     }
 </style>
 
 <div class="login-wrapper">
 
-    <!-- left panel - changes based on which form is showing -->
+    <!-- left navy panel - changes text based on which form is showing -->
     <div class="login-left" id="leftPanel">
         <h2 id="leftTitle">Welcome Back!</h2>
         <p id="leftText">To keep connected with us please login with your personal info</p>
@@ -92,12 +103,12 @@
         <button class="toggle-btn" onclick="toggleForm()">&#8595; SIGN UP</button>
     </div>
 
-    <!-- right panel - shows login or register form -->
+    <!-- right white panel - shows login or register form -->
     <div class="login-right">
 
-        <!-- login form -->
+        <!-- login form - shows by default -->
         <div id="loginForm">
-            <h2 class="text-center mb-4" style="color: #5bc4a0;">Sign In</h2>
+            <h2 class="form-title">Sign In</h2>
             <input type="text" class="form-control" placeholder="&#128100; Username" />
             <input type="password" class="form-control" placeholder="&#128274; Password" />
             <button class="submit-btn">SIGN IN</button>
@@ -105,7 +116,7 @@
 
         <!-- register form - hidden by default -->
         <div id="registerForm" style="display: none;">
-            <h2 class="text-center mb-4" style="color: #5bc4a0;">Create Account</h2>
+            <h2 class="form-title">Create Account</h2>
             <input type="text" class="form-control" placeholder="&#128100; Username" />
             <input type="email" class="form-control" placeholder="&#9993; Email" />
             <input type="number" class="form-control" placeholder="&#128100; Age" />
@@ -131,14 +142,14 @@
         let toggleBtn = document.querySelector('.toggle-btn');
 
         if (showingLogin) {
-            // show login form
+            // switch back to login form
             loginForm.style.display = 'block';
             registerForm.style.display = 'none';
             leftTitle.innerText = 'Welcome Back!';
             leftText.innerText = 'To keep connected with us please login with your personal info';
             toggleBtn.innerHTML = '&#8595; SIGN UP';
         } else {
-            // show register form
+            // switch to register form
             loginForm.style.display = 'none';
             registerForm.style.display = 'block';
             leftTitle.innerText = 'Hello!';

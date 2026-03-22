@@ -13,10 +13,14 @@
 <!-- station search bar -->
 <div class="row justify-content-center mb-4">
     <div class="col-md-6">
-        <div class="input-group">
-            <input type="text" class="form-control form-control-lg" placeholder="Search for a station e.g. Paddington" />
-            <button class="btn btn-primary btn-lg">Search</button>
-        </div>
+        <form method="get">
+            <div class="input-group">
+                <input type="text" name="station" class="form-control form-control-lg" 
+                       placeholder="Search for a station e.g. Paddington" 
+                       value="@Model.searchedStation" />
+                <button class="btn btn-primary btn-lg">Search</button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -29,15 +33,26 @@
                 <tr>
                     <th>Destination</th>
                     <th>Scheduled</th>
-                    <th>Predicted</th>
-                    <th>Platform</th>
                     <th>Status</th>
+                    <th>Platform</th>
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td colspan="5" class="text-center text-muted">Search for a station to see departures</td>
-                </tr>
+                @if (Model.departures.Count == 0)
+                {
+                    <tr>
+                        <td colspan="4" class="text-center text-muted">Search for a station to see departures</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var departure in Model.departures)
+                    {
+                        <tr>
+                            <td>@departure</td>
+                        </tr>
+                    }
+                }
             </tbody>
         </table>
 
@@ -47,15 +62,26 @@
                 <tr>
                     <th>Origin</th>
                     <th>Scheduled</th>
-                    <th>Predicted</th>
-                    <th>Platform</th>
                     <th>Status</th>
+                    <th>Platform</th>
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td colspan="5" class="text-center text-muted">Search for a station to see arrivals</td>
-                </tr>
+                @if (Model.arrivals.Count == 0)
+                {
+                    <tr>
+                        <td colspan="4" class="text-center text-muted">Search for a station to see arrivals</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var arrival in Model.arrivals)
+                    {
+                        <tr>
+                            <td>@arrival</td>
+                        </tr>
+                    }
+                }
             </tbody>
         </table>
     </div>

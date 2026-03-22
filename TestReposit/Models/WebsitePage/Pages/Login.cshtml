@@ -5,7 +5,13 @@
 }
 
 <style>
-    /* main wrapper for the two panels */
+    /* removes default container max width for this page */
+    .container {
+        max-width: 100%;
+        padding: 0 20px;
+    }
+
+    /* main wrapper */
     .login-wrapper {
         display: flex;
         height: 80vh;
@@ -21,6 +27,7 @@
         background-color: #4B4E6D;
         color: white;
         width: 40%;
+        flex-shrink: 0;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -29,43 +36,76 @@
         text-align: center;
     }
 
-    /* right white panel */
+    /* right white panel - must clip everything inside it */
     .login-right {
-        background-color: white;
         width: 60%;
+        flex-shrink: 0;
+        overflow: hidden;
+        position: relative;
+        background-color: white;
+    }
+
+    /* slider sits inside login-right and is twice as wide */
+    .forms-slider {
+        display: flex;
+        width: 200%;
+        height: 100%;
+        transition: transform 0.5s ease;
+    }
+
+    /* each form is exactly half of forms-slider */
+    /* which means each form equals 100% of login-right */
+    .form-panel {
+        width: 50%;
+        flex-shrink: 0;
+        padding: 40px;
+        box-sizing: border-box;
         display: flex;
         flex-direction: column;
         justify-content: center;
-        padding: 40px;
+        background-color: white;
+        overflow: hidden;
     }
 
-    /* arrow button to switch between login and register */
-    .toggle-btn {
+    /* arrow buttons */
+    .arrow-container {
+        display: flex;
+        gap: 12px;
+        margin-top: 20px;
+        justify-content: center;
+    }
+
+    .arrow-btn {
         background: none;
         border: 2px solid white;
         color: white;
-        padding: 10px 30px;
-        border-radius: 25px;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
         cursor: pointer;
-        margin-top: 20px;
-        font-size: 14px;
-        letter-spacing: 1px;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
-    .toggle-btn:hover {
+    .arrow-btn:hover {
         background-color: white;
         color: #4B4E6D;
     }
 
-    /* input fields with a light blue tint */
+    /* input fields */
     .form-control {
         background-color: #f0f4fa;
         border: none;
         padding: 12px;
         margin-bottom: 12px;
+        border-radius: 8px;
+        width: 100%;
+        box-sizing: border-box;
     }
 
-    /* navy blue heading on the right panel */
+    /* navy blue heading */
     .form-title {
         color: #4B4E6D;
         text-align: center;
@@ -84,9 +124,9 @@
         letter-spacing: 1px;
         margin-top: 10px;
         cursor: pointer;
+        box-sizing: border-box;
     }
 
-    /* hover turns mint green to contrast with navy */
     .submit-btn:hover {
         background-color: #84DCC6;
         color: #4B4E6D;
@@ -95,66 +135,65 @@
 
 <div class="login-wrapper">
 
-    <!-- left navy panel - changes text based on which form is showing -->
-    <div class="login-left" id="leftPanel">
+    <!-- left navy panel -->
+    <div class="login-left">
         <h2 id="leftTitle">Welcome Back!</h2>
         <p id="leftText">To keep connected with us please login with your personal info</p>
-        <!-- arrow button to switch between login and register -->
-        <button class="toggle-btn" onclick="toggleForm()">&#8595; SIGN UP</button>
+        <div class="arrow-container">
+            <button class="arrow-btn" onclick="slideLeft()">&#8592;</button>
+            <button class="arrow-btn" onclick="slideRight()">&#8594;</button>
+        </div>
     </div>
 
-    <!-- right white panel - shows login or register form -->
+    <!-- right white panel -->
     <div class="login-right">
+        <div class="forms-slider" id="formsSlider">
 
-        <!-- login form - shows by default -->
-        <div id="loginForm">
-            <h2 class="form-title">Sign In</h2>
-            <input type="text" class="form-control" placeholder="&#128100; Username" />
-            <input type="password" class="form-control" placeholder="&#128274; Password" />
-            <button class="submit-btn">SIGN IN</button>
+            <!-- login form -->
+            <div class="form-panel">
+                <h2 class="form-title">Sign In</h2>
+                <input type="text" class="form-control" placeholder="&#128100; Username" />
+                <input type="password" class="form-control" placeholder="&#128274; Password" />
+                <button class="submit-btn">SIGN IN</button>
+            </div>
+
+            <!-- register form -->
+            <div class="form-panel">
+                <h2 class="form-title">Create Account</h2>
+                <input type="text" class="form-control" placeholder="&#128100; Username" />
+                <input type="email" class="form-control" placeholder="&#9993; Email" />
+                <input type="number" class="form-control" placeholder="&#128100; Age" />
+                <input type="tel" class="form-control" placeholder="&#128222; Phone" />
+                <input type="password" class="form-control" placeholder="&#128274; Password" />
+                <button class="submit-btn">SIGN UP</button>
+            </div>
+
         </div>
-
-        <!-- register form - hidden by default -->
-        <div id="registerForm" style="display: none;">
-            <h2 class="form-title">Create Account</h2>
-            <input type="text" class="form-control" placeholder="&#128100; Username" />
-            <input type="email" class="form-control" placeholder="&#9993; Email" />
-            <input type="number" class="form-control" placeholder="&#128100; Age" />
-            <input type="tel" class="form-control" placeholder="&#128222; Phone" />
-            <input type="password" class="form-control" placeholder="&#128274; Password" />
-            <button class="submit-btn">SIGN UP</button>
-        </div>
-
     </div>
 </div>
 
 <script>
-    // tracks which form is currently showing
-    let showingLogin = true;
+    let showingRegister = false;
 
-    // switches between login and register when the arrow button is clicked
-    function toggleForm() {
-        showingLogin = !showingLogin;
-        let loginForm = document.getElementById('loginForm');
-        let registerForm = document.getElementById('registerForm');
-        let leftTitle = document.getElementById('leftTitle');
-        let leftText = document.getElementById('leftText');
-        let toggleBtn = document.querySelector('.toggle-btn');
+    // slides right to show the register form
+    function slideRight() {
+        if (!showingRegister) {
+            showingRegister = true;
+            // translateX(-50%) moves the slider left by half its width
+            // which is exactly the width of one form panel
+            document.getElementById('formsSlider').style.transform = 'translateX(-50%)';
+            document.getElementById('leftTitle').innerText = 'Hello!';
+            document.getElementById('leftText').innerText = 'Enter your details and start your journey with us';
+        }
+    }
 
-        if (showingLogin) {
-            // switch back to login form
-            loginForm.style.display = 'block';
-            registerForm.style.display = 'none';
-            leftTitle.innerText = 'Welcome Back!';
-            leftText.innerText = 'To keep connected with us please login with your personal info';
-            toggleBtn.innerHTML = '&#8595; SIGN UP';
-        } else {
-            // switch to register form
-            loginForm.style.display = 'none';
-            registerForm.style.display = 'block';
-            leftTitle.innerText = 'Hello!';
-            leftText.innerText = 'Enter your details and start your journey with us';
-            toggleBtn.innerHTML = '&#8593; SIGN IN';
+    // slides left to show the login form
+    function slideLeft() {
+        if (showingRegister) {
+            showingRegister = false;
+            document.getElementById('formsSlider').style.transform = 'translateX(0)';
+            document.getElementById('leftTitle').innerText = 'Welcome Back!';
+            document.getElementById('leftText').innerText = 'To keep connected with us please login with your personal info';
         }
     }
 </script>

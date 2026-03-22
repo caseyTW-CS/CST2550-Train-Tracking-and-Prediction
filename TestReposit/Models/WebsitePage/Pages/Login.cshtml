@@ -4,39 +4,146 @@
     ViewData["Title"] = "Login";
 }
 
-<!-- page header -->
-<div class="text-center mb-4">
-    <h1 class="display-4">Login</h1>
-    <p class="lead">Sign in to your LineTrack account</p>
-</div>
+<style>
+    /* hides the default container padding for this page */
+    .login-wrapper {
+        display: flex;
+        height: 80vh;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        max-width: 900px;
+        margin: 0 auto;
+    }
 
-<!-- login form -->
-<div class="row justify-content-center">
-    <div class="col-md-4">
-        <div class="card p-4">
+    /* left green panel */
+    .login-left {
+        background-color: #5bc4a0;
+        color: white;
+        width: 40%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 40px;
+        text-align: center;
+    }
 
-            <!-- username field -->
-            <div class="mb-3">
-                <label class="form-label">Username</label>
-                <input type="text" class="form-control" placeholder="Enter your username" />
-            </div>
+    /* right white panel */
+    .login-right {
+        background-color: white;
+        width: 60%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 40px;
+    }
 
-            <!-- password field -->
-            <div class="mb-3">
-                <label class="form-label">Password</label>
-                <input type="password" class="form-control" placeholder="Enter your password" />
-            </div>
+    /* toggle arrow button at the bottom */
+    .toggle-btn {
+        background: none;
+        border: 2px solid white;
+        color: white;
+        padding: 10px 30px;
+        border-radius: 25px;
+        cursor: pointer;
+        margin-top: 20px;
+        font-size: 14px;
+        letter-spacing: 1px;
+    }
 
-            <!-- login button -->
-            <div class="d-grid">
-                <button class="btn btn-primary btn-lg">Login</button>
-            </div>
+    .toggle-btn:hover {
+        background-color: white;
+        color: #5bc4a0;
+    }
 
-            <!-- register link -->
-            <div class="text-center mt-3">
-                <p class="text-muted">Don't have an account? <a href="#">Register here</a></p>
-            </div>
+    .form-control {
+        background-color: #f0faf5;
+        border: none;
+        padding: 12px;
+        margin-bottom: 12px;
+    }
 
+    .submit-btn {
+        background-color: #5bc4a0;
+        color: white;
+        border: none;
+        padding: 12px;
+        border-radius: 25px;
+        width: 100%;
+        font-size: 16px;
+        letter-spacing: 1px;
+        margin-top: 10px;
+        cursor: pointer;
+    }
+
+    .submit-btn:hover {
+        background-color: #3da882;
+    }
+</style>
+
+<div class="login-wrapper">
+
+    <!-- left panel - changes based on which form is showing -->
+    <div class="login-left" id="leftPanel">
+        <h2 id="leftTitle">Welcome Back!</h2>
+        <p id="leftText">To keep connected with us please login with your personal info</p>
+        <!-- arrow button to switch between login and register -->
+        <button class="toggle-btn" onclick="toggleForm()">&#8595; SIGN UP</button>
+    </div>
+
+    <!-- right panel - shows login or register form -->
+    <div class="login-right">
+
+        <!-- login form -->
+        <div id="loginForm">
+            <h2 class="text-center mb-4" style="color: #5bc4a0;">Sign In</h2>
+            <input type="text" class="form-control" placeholder="&#128100; Username" />
+            <input type="password" class="form-control" placeholder="&#128274; Password" />
+            <button class="submit-btn">SIGN IN</button>
         </div>
+
+        <!-- register form - hidden by default -->
+        <div id="registerForm" style="display: none;">
+            <h2 class="text-center mb-4" style="color: #5bc4a0;">Create Account</h2>
+            <input type="text" class="form-control" placeholder="&#128100; Username" />
+            <input type="email" class="form-control" placeholder="&#9993; Email" />
+            <input type="number" class="form-control" placeholder="&#128100; Age" />
+            <input type="tel" class="form-control" placeholder="&#128222; Phone" />
+            <input type="password" class="form-control" placeholder="&#128274; Password" />
+            <button class="submit-btn">SIGN UP</button>
+        </div>
+
     </div>
 </div>
+
+<script>
+    // tracks which form is currently showing
+    let showingLogin = true;
+
+    // switches between login and register when the arrow button is clicked
+    function toggleForm() {
+        showingLogin = !showingLogin;
+        let loginForm = document.getElementById('loginForm');
+        let registerForm = document.getElementById('registerForm');
+        let leftTitle = document.getElementById('leftTitle');
+        let leftText = document.getElementById('leftText');
+        let toggleBtn = document.querySelector('.toggle-btn');
+
+        if (showingLogin) {
+            // show login form
+            loginForm.style.display = 'block';
+            registerForm.style.display = 'none';
+            leftTitle.innerText = 'Welcome Back!';
+            leftText.innerText = 'To keep connected with us please login with your personal info';
+            toggleBtn.innerHTML = '&#8595; SIGN UP';
+        } else {
+            // show register form
+            loginForm.style.display = 'none';
+            registerForm.style.display = 'block';
+            leftTitle.innerText = 'Hello!';
+            leftText.innerText = 'Enter your details and start your journey with us';
+            toggleBtn.innerHTML = '&#8593; SIGN IN';
+        }
+    }
+</script>

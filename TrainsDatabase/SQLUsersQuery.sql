@@ -43,7 +43,6 @@ CREATE TABLE userInfo (
 	userAge SMALLINT NOT NULL,
 	userEmail NVARCHAR(100) NULL,
 	userPhone NVARCHAR(20) NOT NULL,
-	--userRailcard NVARCHAR(50) NULL
 );
 GO
 

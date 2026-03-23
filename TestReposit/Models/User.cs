@@ -19,8 +19,6 @@ namespace TestReposit
         //user phone number:
         public string userPhone { get; private set; }
 
-        //for storing 
-        public List<string> userTickets { get; private set; }
 
         public string userRailcard { get; private set; }
 
@@ -32,8 +30,6 @@ namespace TestReposit
             userAge = age;
             userEmail = email;
             userPhone = phone;
-            userRailcard = railcard;
-            userTickets = new List<string>();
         }
 
         // checks if the password the user typed matches their account

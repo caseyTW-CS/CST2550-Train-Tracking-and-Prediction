@@ -152,21 +152,22 @@
             <!-- login form -->
             <div class="form-panel">
                 <h2 class="form-title">Sign In</h2>
-                <input type="text" class="form-control" placeholder="&#128100; Username" />
-                <input type="password" class="form-control" placeholder="&#128274; Password" />
+                <input id="loginUsername" type="text" class="form-control" placeholder="&#128100; Username" />
+                <input id="loginPassword" type="password" class="form-control" placeholder="&#128274; Password" />
                 <button class="submit-btn">SIGN IN</button>
             </div>
 
             <!-- register form -->
-            <div class="form-panel">
-                <h2 class="form-title">Create Account</h2>
-                <input type="text" class="form-control" placeholder="&#128100; Username" />
-                <input type="email" class="form-control" placeholder="&#9993; Email" />
-                <input type="number" class="form-control" placeholder="&#128100; Age" />
-                <input type="tel" class="form-control" placeholder="&#128222; Phone" />
-                <input type="password" class="form-control" placeholder="&#128274; Password" />
-                <button class="submit-btn">SIGN UP</button>
-            </div>
+            <form method="post" asp-page-handler="Register">
+                <input asp-for="newUser.userName" placeholder="newUsername"/>
+                <input asp-for="newUser.userPass" type="password" placeholder="newPassword"/>
+                <input asp-for="newUser.userAge" placeholder="newAge"/>
+                <input asp-for="newUser.userEmail" placeholder="newEmail"/>    
+                <input asp-for="newUser.userPhone" placeholder="newPhone"/>
+                
+
+                <button type="submit">Sign Up</button>
+            </form>
 
         </div>
     </div>
@@ -196,4 +197,5 @@
             document.getElementById('leftText').innerText = 'To keep connected with us please login with your personal info';
         }
     }
+
 </script>

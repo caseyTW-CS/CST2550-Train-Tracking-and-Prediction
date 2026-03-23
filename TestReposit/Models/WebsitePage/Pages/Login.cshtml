@@ -5,13 +5,11 @@
 }
 
 <style>
-    /* removes default container max width for this page */
     .container {
         max-width: 100%;
         padding: 0 20px;
     }
 
-    /* main wrapper */
     .login-wrapper {
         display: flex;
         height: 80vh;
@@ -36,7 +34,7 @@
         text-align: center;
     }
 
-    /* right white panel - must clip everything inside it */
+    /* right white panel */
     .login-right {
         width: 60%;
         flex-shrink: 0;
@@ -54,7 +52,6 @@
     }
 
     /* each form is exactly half of forms-slider */
-    /* which means each form equals 100% of login-right */
     .form-panel {
         width: 50%;
         flex-shrink: 0;
@@ -94,8 +91,8 @@
         color: #4B4E6D;
     }
 
-    /* input fields */
-    .form-control {
+    /* input fields - applies to both forms */
+    .form-control, .register-form input {
         background-color: #f0f4fa;
         border: none;
         padding: 12px;
@@ -103,6 +100,7 @@
         border-radius: 8px;
         width: 100%;
         box-sizing: border-box;
+        font-size: 15px;
     }
 
     /* navy blue heading */
@@ -112,8 +110,8 @@
         margin-bottom: 1.5rem;
     }
 
-    /* submit button */
-    .submit-btn {
+    /* submit button - applies to both forms */
+    .submit-btn, .register-form button {
         background-color: #4B4E6D;
         color: white;
         border: none;
@@ -127,9 +125,16 @@
         box-sizing: border-box;
     }
 
-    .submit-btn:hover {
+    .submit-btn:hover, .register-form button:hover {
         background-color: #84DCC6;
         color: #4B4E6D;
+    }
+
+    /* makes the register form fill the panel properly */
+    .register-form {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
     }
 </style>
 
@@ -149,25 +154,32 @@
     <div class="login-right">
         <div class="forms-slider" id="formsSlider">
 
-            <!-- login form -->
+<!-- login form -->
+<div class="form-panel">
+    <h2 class="form-title">Sign In</h2>
+    @if (Model.message != null)
+    {
+        <!-- shows error message if login fails -->
+        <div class="alert alert-danger">@Model.message</div>
+    }
+    <form method="post" asp-page-handler="Login" class="register-form">
+        <input asp-for="loginUsername" type="text" placeholder="&#128100; Username" />
+        <input asp-for="loginPassword" type="password" placeholder="&#128274; Password" />
+        <button type="submit">SIGN IN</button>
+    </form>
+</div>
+
             <div class="form-panel">
-                <h2 class="form-title">Sign In</h2>
-                <input id="loginUsername" type="text" class="form-control" placeholder="&#128100; Username" />
-                <input id="loginPassword" type="password" class="form-control" placeholder="&#128274; Password" />
-                <button class="submit-btn">SIGN IN</button>
+                <h2 class="form-title">Create Account</h2>
+                <form method="post" asp-page-handler="Register" class="register-form">
+                    <input asp-for="newUser.userName" placeholder="&#128100; Username" />
+                    <input asp-for="newUser.userPass" type="password" placeholder="&#128274; Password" />
+                    <input asp-for="newUser.userAge" placeholder="&#128100; Age" />
+                    <input asp-for="newUser.userEmail" placeholder="&#9993; Email" />
+                    <input asp-for="newUser.userPhone" placeholder="&#128222; Phone" />
+                    <button type="submit">SIGN UP</button>
+                </form>
             </div>
-
-            <!-- register form -->
-            <form method="post" asp-page-handler="Register">
-                <input asp-for="newUser.userName" placeholder="newUsername"/>
-                <input asp-for="newUser.userPass" type="password" placeholder="newPassword"/>
-                <input asp-for="newUser.userAge" placeholder="newAge"/>
-                <input asp-for="newUser.userEmail" placeholder="newEmail"/>    
-                <input asp-for="newUser.userPhone" placeholder="newPhone"/>
-                
-
-                <button type="submit">Sign Up</button>
-            </form>
 
         </div>
     </div>
@@ -180,8 +192,6 @@
     function slideRight() {
         if (!showingRegister) {
             showingRegister = true;
-            // translateX(-50%) moves the slider left by half its width
-            // which is exactly the width of one form panel
             document.getElementById('formsSlider').style.transform = 'translateX(-50%)';
             document.getElementById('leftTitle').innerText = 'Hello!';
             document.getElementById('leftText').innerText = 'Enter your details and start your journey with us';
@@ -197,5 +207,4 @@
             document.getElementById('leftText').innerText = 'To keep connected with us please login with your personal info';
         }
     }
-
 </script>

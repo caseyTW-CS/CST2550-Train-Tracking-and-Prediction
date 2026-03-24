@@ -1,55 +1,208 @@
-﻿  @page
+﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Home";
 }
 
-<!-- main container for the whole page -->
-<div class="text-center">
+<style>
 
-    <!-- header section -->
-    <h1 class="display-4">Where's the Train?</h1>
-    <p class="lead">Track trains, check arrivals and plan your journey on our train app</p>
+    /* hero section with the big title */
+    .hero {
+        text-align: center;
+        padding: 3rem 0 2rem 0;
+    }
+
+    /* big cursive title like the design */
+    .hero-title {
+        font-family: 'Dancing Script', cursive;
+        font-size: 72px;
+        color: #2d4a7a;
+        margin-bottom: 1rem;
+    }
+
+    .hero-subtitle {
+        color: #6b7c93;
+        font-size: 18px;
+        margin-bottom: 2rem;
+    }
+
+    /* the three action buttons at the top */
+    .action-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .action-btn {
+        padding: 12px 24px;
+        border-radius: 25px;
+        border: 1.5px solid #d0dce8;
+        background: white;
+        color: #2d4a7a;
+        font-size: 15px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+
+    /* the active/filled button */
+    .action-btn.active {
+        background-color: #2d4a7a;
+        color: white;
+        border-color: #2d4a7a;
+    }
+
+    .action-btn:hover {
+        background-color: #2d4a7a;
+        color: white;
+        border-color: #2d4a7a;
+        text-decoration: none;
+    }
+
+    /* live service status dot and text */
+    .service-status {
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+
+    .status-dot {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: #28a745;
+        margin-right: 6px;
+    }
+
+    .status-text {
+        font-size: 17px;
+        font-weight: 500;
+        color: #2d4a7a;
+    }
+
+    .status-sub {
+        color: #6b7c93;
+        font-size: 14px;
+        margin-top: 4px;
+    }
+
+    /* the three info cards at the bottom */
+    .cards-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        margin-bottom: 3rem;
+    }
+
+    .info-card {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        text-align: center;
+        border: 1px solid #e8f0f8;
+    }
+
+    /* icon circle at the top of each card */
+    .card-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background-color: #e8f2fc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem auto;
+        font-size: 28px;
+    }
+
+    .card-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #2d4a7a;
+        margin-bottom: 0.5rem;
+    }
+
+    .card-text {
+        color: #6b7c93;
+        font-size: 14px;
+        margin-bottom: 1.5rem;
+        line-height: 1.6;
+    }
+
+    /* blue button at the bottom of each card */
+    .card-btn {
+        display: block;
+        background-color: #4a7cc7;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .card-btn:hover {
+        background-color: #2d4a7a;
+        color: white;
+        text-decoration: none;
+    }
+</style>
+
+<!-- hero section -->
+<div class="hero">
+    <!-- big cursive title matching the logo font -->
+    <h1 class="hero-title">Where's the Train?</h1>
+    <p class="hero-subtitle">Track trains, check arrivals and plan your journey on our train app</p>
 
     <!-- quick action buttons -->
-    <div class="mt-4">
-        <a href="/TrainTracker" class="btn btn-primary btn-lg m-2">Track a Train</a>
-        <a href="/Departures" class="btn btn-secondary btn-lg m-2">Departures & Arrivals</a>
-        <a href="/Account" class="btn btn-outline-primary btn-lg m-2">My Account</a>
+    <div class="action-buttons">
+        <a href="/TrainTracker" class="action-btn active">Track a Train</a>
+        <a href="/Departures" class="action-btn">&#128643; Departures & Arrivals</a>
+        <a href="/Account" class="action-btn">&#128276; My Account</a>
+    </div>
+</div>
+
+<!-- live service status -->
+<div class="service-status">
+    <div>
+        <span class="status-dot"></span>
+        <span class="status-text">Live Service Status</span>
+    </div>
+    <!-- this will eventually be dynamic based on real delay data -->
+    <p class="status-sub">Elizabeth Line: Good Service</p>
+</div>
+
+<!-- three info cards -->
+<div class="cards-row">
+
+    <!-- train positions card -->
+    <div class="info-card">
+        <div class="card-icon">&#128205;</div>
+        <h3 class="card-title">Train Positions</h3>
+        <p class="card-text">See a real-time map of where every train is on the Elizabeth Line</p>
+        <a href="/TrainTracker" class="card-btn">View Map</a>
     </div>
 
-    <!-- status section showing if there are any delays -->
-    <div class="mt-5">
-        <h3>Live Service Status</h3>
-        <div class="alert alert-success mt-3">
-            <!-- this will eventually be dynamic based on real delay data -->
-            Elizabeth Line: Good Service
-        </div>
+    <!-- departures board card -->
+    <div class="info-card">
+        <div class="card-icon">&#128643;</div>
+        <h3 class="card-title">Departures Board</h3>
+        <p class="card-text">Check upcoming arrivals and departures for any station</p>
+        <a href="/Departures" class="card-btn">View Departures</a>
     </div>
 
-    <!-- quick info cards at the bottom -->
-    <div class="row mt-5">
-        <div class="col-md-4">
-            <div class="card p-3">
-                <h5>Train Positions</h5>
-                <p>See where every train is right now on the Elizabeth Line</p>
-                <a href="/TrainTracker" class="btn btn-primary">View Trains</a>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card p-3">
-                <h5>Departures Board</h5>
-                <p>Check upcoming arrivals and departures at any station</p>
-                <a href="/Departures" class="btn btn-primary">View Board</a>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card p-3">
-                <h5>Delay Alerts</h5>
-                <p>Get notified about disruptions and delays on your route</p>
-                <a href="/Alerts" class="btn btn-primary">View Alerts</a>
-            </div>
-        </div>
+    <!-- delay alerts card -->
+    <div class="info-card">
+        <div class="card-icon">&#128276;</div>
+        <h3 class="card-title">Delay Alerts</h3>
+        <p class="card-text">Receive notifications about disruptions and delays on your route</p>
+        <a href="/Alerts" class="card-btn">View Alerts</a>
     </div>
 
 </div>

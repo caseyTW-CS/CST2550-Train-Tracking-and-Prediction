@@ -5,20 +5,33 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace TestReposit.Models.WebsitePage.Pages
 {
+    public class DepartureEntry
+    {
+        public string Destination { get; set; }
+        public string ScheduledDeparture { get; set; }
+        public string Status { get; set; }
+        public string Platform { get; set; }
+        public int DelayMinutes { get; set; }
+    }
+
+    public class ArrivalEntry
+    {
+        public string Origin { get; set; }
+        public string ScheduledArrival { get; set; }
+        public string Status { get; set; }
+        public string Platform { get; set; }
+        public int DelayMinutes { get; set; }
+    }
+
     public class DeparturesModel : PageModel
     {
-        // stores the search term the user typed
         public string searchedStation { get; set; }
-        // stores the departures to display on the page
-        public List<string> departures { get; set; } = new List<string>();
-        // stores the arrivals to display on the page
-        public List<string> arrivals { get; set; } = new List<string>();
+        public List<DepartureEntry> departures { get; set; } = new List<DepartureEntry>();
+        public List<ArrivalEntry> arrivals { get; set; } = new List<ArrivalEntry>();
 
-        // this runs when the page first loads
         public void OnGet(string station)
         {
             searchedStation = station;
-            // if the user searched for a station load the data
             if (!string.IsNullOrEmpty(station))
             {
                 loadDepartures(station);
@@ -26,7 +39,6 @@ namespace TestReposit.Models.WebsitePage.Pages
             }
         }
 
-        // queries the database for departures from the searched station
         private void loadDepartures(string stationName)
         {
             string connectionString =
@@ -36,10 +48,9 @@ namespace TestReposit.Models.WebsitePage.Pages
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
-                    // get all journeys departing from the searched station
-                    string query = @"SELECT j.scheduledDeparture, j.scheduledArrival, 
-                                    j.currentDelayMinutes, j.journeyStatus, 
-                                    s.stationName as destination, s.stationPlatform
+                    string query = @"SELECT j.scheduledDeparture, j.currentDelayMinutes, 
+                                    j.journeyStatus, s.stationName as destination, 
+                                    s.stationPlatform
                                     FROM Journey j
                                     JOIN Station s ON j.arrivalStationID = s.stationID
                                     JOIN Station ds ON j.departureStationID = ds.stationID
@@ -49,22 +60,25 @@ namespace TestReposit.Models.WebsitePage.Pages
                     SqlDataReader reader = cmd.ExecuteReader();
                     while (reader.Read())
                     {
-                        // format each departure as a readable string for now
-                        departures.Add($"{reader["destination"]} | " +
-                                      $"{reader["scheduledDeparture"]} | " +
-                                      $"{reader["journeyStatus"]} | " +
-                                      $"Platform {reader["stationPlatform"]}");
+                        departures.Add(new DepartureEntry
+                        {
+                            Destination = reader["destination"].ToString(),
+                            ScheduledDeparture = Convert.ToDateTime(reader["scheduledDeparture"]).ToString("ddd dd MMM, HH:mm"),
+                            Status = reader["journeyStatus"].ToString(),
+                            Platform = reader["stationPlatform"].ToString(),
+                            DelayMinutes = reader["currentDelayMinutes"] != DBNull.Value
+                                ? Convert.ToInt32(reader["currentDelayMinutes"]) : 0
+                        });
                     }
                 }
             }
             catch (Exception e)
             {
                 // if something goes wrong show an error message
-                departures.Add($"Error loading departures: {e.Message}");
+                departures.Add(new DepartureEntry { Destination = $"Error: {e.Message}" });
             }
         }
 
-        // queries the database for arrivals at the searched station
         private void loadArrivals(string stationName)
         {
             string connectionString =
@@ -74,7 +88,6 @@ namespace TestReposit.Models.WebsitePage.Pages
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
-                    // get all journeys arriving at the searched station
                     string query = @"SELECT j.scheduledArrival, j.currentDelayMinutes,
                                     j.journeyStatus, s.stationName as origin,
                                     s.stationPlatform
@@ -87,18 +100,22 @@ namespace TestReposit.Models.WebsitePage.Pages
                     SqlDataReader reader = cmd.ExecuteReader();
                     while (reader.Read())
                     {
-                        // format each arrival as a readable string for now
-                        arrivals.Add($"{reader["origin"]} | " +
-                                    $"{reader["scheduledArrival"]} | " +
-                                    $"{reader["journeyStatus"]} | " +
-                                    $"Platform {reader["stationPlatform"]}");
+                        arrivals.Add(new ArrivalEntry
+                        {
+                            Origin = reader["origin"].ToString(),
+                            ScheduledArrival = Convert.ToDateTime(reader["scheduledArrival"]).ToString("ddd dd MMM, HH:mm"),
+                            Status = reader["journeyStatus"].ToString(),
+                            Platform = reader["stationPlatform"].ToString(),
+                            DelayMinutes = reader["currentDelayMinutes"] != DBNull.Value
+                                ? Convert.ToInt32(reader["currentDelayMinutes"]) : 0
+                        });
                     }
                 }
             }
             catch (Exception e)
             {
                 // if something goes wrong show an error message
-                arrivals.Add($"Error loading arrivals: {e.Message}");
+                arrivals.Add(new ArrivalEntry { Origin = $"Error: {e.Message}" });
             }
         }
     }

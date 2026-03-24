@@ -1,4 +1,12 @@
-﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
-
-// Write your JavaScript code.
+﻿// force nav links to truly centre regardless of bootstrap
+document.addEventListener('DOMContentLoaded', function () {
+    const nav = document.querySelector('.navbar-nav');
+    const navbar = document.querySelector('.navbar');
+    if (nav && navbar) {
+        nav.style.position = 'absolute';
+        nav.style.left = '50%';
+        nav.style.transform = 'translateX(-50%)';
+        nav.style.top = '50%';
+        nav.style.marginTop = '-' + (nav.offsetHeight / 2) + 'px';
+    }
+});

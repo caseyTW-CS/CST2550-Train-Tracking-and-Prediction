@@ -9,39 +9,28 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container">
-                <a class="navbar-brand" asp-page="/Index">Where's the Train?</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav me-auto mb-2 mb-sm-0">
-                        <li class="nav-item">
-                            <a class="nav-link" asp-page="/Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-page="/Departures">Departures</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-page="/TrainTracker">Train Tracker</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-page="/Alerts">Alerts</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-page="/Account">My Account</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-page="/Login">Login</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-page="/Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
+<nav class="navbar navbar-expand-sm box-shadow mb-3">
+    <div class="container-fluid px-4 d-flex align-items-center">
+        <a class="navbar-brand" asp-page="/Index">Where's the Train?</a>
+
+        <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav position-absolute start-50 translate-middle-x mb-2 mb-sm-0">
+                <li class="nav-item"><a class="nav-link" asp-page="/Index">Home</a></li>
+                <li class="nav-item"><a class="nav-link" asp-page="/Departures">Departures</a></li>
+                <li class="nav-item"><a class="nav-link" asp-page="/TrainTracker">Train Tracker</a></li>
+                <li class="nav-item"><a class="nav-link" asp-page="/Alerts">Alerts</a></li>
+                <li class="nav-item"><a class="nav-link" asp-page="/Account">My Account</a></li>
+                <li class="nav-item"><a class="nav-link" asp-page="/Login">Login</a></li>
+                <li class="nav-item"><a class="nav-link" asp-page="/Privacy">Privacy</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
         </nav>
     </header>
 
@@ -57,7 +46,6 @@
         </div>
     </footer>
 
-    <!-- Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

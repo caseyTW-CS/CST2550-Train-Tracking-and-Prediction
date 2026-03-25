@@ -5,6 +5,7 @@ namespace TestReposit
 {
     public class Users
     {
+        //Attributes:
         public string userName { get; set; }
         public string userPass { get; set; }
         public int userAge { get; set; }
@@ -15,7 +16,7 @@ namespace TestReposit
         { 
         } 
 
-        // Optional: validate login method
+        //Validate login method
         public bool validateLogin(string enteredPass)
         {
             return BCrypt.Net.BCrypt.Verify(enteredPass, userPass);

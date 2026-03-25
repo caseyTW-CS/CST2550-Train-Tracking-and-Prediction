@@ -3,10 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using System.Data.SqlClient;
 using TestReposit;
 
-namespace WebsitePage.Pages  // ← fixed namespace
+namespace WebsitePage.Pages 
 {
     public class LoginModel : PageModel
     {
+        //Attributes:
         [BindProperty]
         public Users newUser { get; set; }
 
@@ -24,6 +25,7 @@ namespace WebsitePage.Pages  // ← fixed namespace
 
         public IActionResult OnPostRegister()
         {
+            //Connection string to Users sql database
             string connectionStringUser = "Server=trainserver.database.windows.net;Initial Catalog=Users;User ID=CT855;Password=TrainPredicPass123;Encrypt=True;";
 
             using (SqlConnection conn = new SqlConnection(connectionStringUser))
@@ -35,6 +37,7 @@ namespace WebsitePage.Pages  // ← fixed namespace
 
                 SqlCommand cmd = new SqlCommand(query, conn);
 
+                //Encrypts password before sending
                 string hashedPassword = BCrypt.Net.BCrypt.HashPassword(newUser.userPass);
 
                 cmd.Parameters.AddWithValue("@newUsername", newUser.userName);

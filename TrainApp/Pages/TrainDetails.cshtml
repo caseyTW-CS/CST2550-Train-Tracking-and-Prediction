@@ -1,0 +1,68 @@
+@page
+@model TrainApp.Pages.TrainDetailsModel
+
+<div class="container mt-4" style="max-width:900px;">
+
+    <div class="card shadow p-4 mb-4 text-center">
+
+        <h3>@Model.Start → @Model.Destination</h3>
+
+        @if (Model.TimeToStation <= 0)
+        {
+            <div class="alert alert-success mt-3">
+                🚆 Train is <b>at the station now</b>
+            </div>
+        }
+        else
+        {
+            <div class="row mt-3">
+                <div class="col">
+                    <small>Depart</small><br />
+                    <b>@Model.DepartureTime</b>
+                </div>
+
+                <div class="col">
+                    <small>Arrive</small><br />
+                    <b>@Model.ArrivalTime</b>
+                </div>
+
+                <div class="col">
+                    <small>Duration</small><br />
+                    <b>@Model.DurationMinutes mins</b>
+                </div>
+            </div>
+        }
+
+    </div>
+
+    <div class="card shadow p-4">
+
+        <h5>Journey Route</h5>
+
+        <ul class="list-group">
+            @for (int i = 0; i < Model.Route.Count; i++)
+            {
+                <li class="list-group-item d-flex justify-content-between">
+
+                    <span>@Model.Route[i]</span>
+
+                    @if (i == 0)
+                    {
+                        <span class="badge bg-primary">Start</span>
+                    }
+                    else if (i == Model.Route.Count - 1)
+                    {
+                        <span class="badge bg-success">Destination</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">Stop</span>
+                    }
+
+                </li>
+            }
+        </ul>
+
+    </div>
+
+</div>

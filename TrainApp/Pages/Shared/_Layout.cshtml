@@ -1,0 +1,116 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Where's the Train?</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+
+<body>
+<header>
+    <nav class="navbar navbar-expand-sm box-shadow mb-3">
+        <div class="container-fluid px-4 d-flex align-items-center">
+
+            <!-- LOGO -->
+            <a class="navbar-brand" asp-page="/Index">Where's the Train?</a>
+
+            <!-- MOBILE BUTTON -->
+            <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse">
+
+                <!-- RIGHT SIDE -->
+                <div class="ms-auto d-flex align-items-center gap-3">
+
+                    <!-- 🚦 SERVICE STATUS -->
+                    <span id="serviceStatus" style="font-weight:500;">
+                        ● Loading...
+                    </span>
+
+                    <!-- ⭐ FAVOURITES -->
+                    <a asp-page="/Account#favourites" title="Favourites" style="text-decoration:none; font-size:20px;">
+                        ⭐
+                    </a>
+
+                    <!-- 👤 USER / LOGIN -->
+                    @if (Context.Session.GetString("UserName") != null)
+                    {
+                        <span class="text-dark">
+                            Hello @Context.Session.GetString("UserName")
+                        </span>
+
+                        <a asp-page="/Account" title="My Account" style="text-decoration:none; font-size: 26px;">
+                            &#128100;
+                        </a>
+
+                        <a asp-page="/Logout" class="btn btn-outline-danger btn-sm">
+                            Logout
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-page="/Login" title="Login" style="text-decoration:none; font-size: 26px;">
+                            &#128100;
+                        </a>
+                    }
+
+                </div>
+
+            </div>
+        </div>
+    </nav>
+</header>
+
+<!-- MAIN CONTENT -->
+<div class="container">
+    <main role="main" class="pb-3">
+        @RenderBody()
+    </main>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer text-muted" style="display: flex; align-items: flex-end; padding-bottom: 8px;">
+    <div class="container text-center border-top pt-2">
+        &copy; 2026 - Where's the Train?<br> All Rights Reserved
+    </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- 🚦 LIVE SERVICE STATUS -->
+<script>
+fetch("https://api.tfl.gov.uk/Line/elizabeth/Status")
+.then(res => res.json())
+.then(data => {
+    const status = data[0].lineStatuses[0].statusSeverityDescription;
+    const el = document.getElementById("serviceStatus");
+
+    if (status.includes("Good")) {
+        el.innerHTML = "● Good Service";
+        el.style.color = "green";
+    }
+    else if (status.includes("Minor")) {
+        el.innerHTML = "● Minor Delays";
+        el.style.color = "orange";
+    }
+    else {
+        el.innerHTML = "● Delays";
+        el.style.color = "red";
+    }
+})
+.catch(() => {
+    document.getElementById("serviceStatus").innerHTML = "● Unknown";
+});
+</script>
+
+@RenderSection("Scripts", required: false)
+
+</body>
+</html>

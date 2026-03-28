@@ -1,0 +1,134 @@
+@page "{id:int}"
+@model TrainApp.Pages.TrackTrainModel
+
+<style>
+    .map-container {
+        max-width: 900px;
+        margin: 40px auto;
+        text-align: center;
+    }
+
+    .line {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 40px 0;
+        position: relative;
+    }
+
+    .line::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 6px;
+        background-color: #6a1b9a;
+        z-index: 0;
+    }
+
+    .station {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+    }
+
+    .dot {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background-color: #ccc;
+        margin: 0 auto;
+    }
+
+    .current .dot {
+        background-color: green;
+        transform: scale(1.3);
+    }
+
+    .next .dot {
+        background-color: orange;
+    }
+
+    .label {
+        margin-top: 8px;
+        font-size: 12px;
+    }
+
+    .train-icon {
+        font-size: 22px;
+        margin-top: 5px;
+    }
+
+    .info-box {
+        margin-top: 20px;
+        padding: 15px;
+        background: #f5f5f5;
+        border-radius: 10px;
+    }
+
+    .arrivals {
+        margin-top: 30px;
+        text-align: left;
+    }
+
+    .arrival-item {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+    }
+</style>
+
+<div class="map-container">
+
+    <h2>@Model.trainName</h2>
+    <p>@Model.start → @Model.end</p>
+
+    <!-- Train line -->
+    <div class="line">
+        @foreach (var stop in Model.route)
+        {
+            var cssClass = "";
+            if (stop == Model.currentStation) cssClass = "current";
+            else if (stop == Model.nextStation) cssClass = "next";
+
+            <div class="station @cssClass">
+                <div class="dot"></div>
+
+                @if (stop == Model.currentStation)
+                {
+                    <div class="train-icon">🚆</div>
+                }
+
+                <div class="label">@stop</div>
+            </div>
+        }
+    </div>
+
+    <!-- Status -->
+    <div class="info-box">
+        <b>Status:</b> @Model.status <br />
+        <b>Current:</b> @Model.currentStation <br />
+        <b>Next:</b> @Model.nextStation
+    </div>
+
+    <!-- Live Arrivals -->
+    <div class="arrivals">
+        <h3>Live Elizabeth Line Arrivals</h3>
+
+        @foreach (var train in Model.arrivals)
+        {
+            <div class="arrival-item">
+                <b>@train.destinationName</b> <br />
+                Station: @train.stationName <br />
+                Arrival: @(train.timeToStation / 60) mins
+            </div>
+        }
+    </div>
+
+</div>
+
+<script>
+    setTimeout(function () {
+        location.reload();
+    }, 5000);
+</script>

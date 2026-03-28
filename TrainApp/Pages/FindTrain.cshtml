@@ -1,0 +1,74 @@
+@page
+@model TrainApp.Pages.FindTrainModel
+
+<div class="container mt-4" style="max-width:700px;">
+
+    <div class="card p-4 shadow">
+
+        <h2 class="mb-3 text-center">Find My Train</h2>
+
+        <form method="post">
+
+            <!-- Start Station -->
+            <div class="mb-3">
+                <label>Start Station</label>
+                <select asp-for="StartId" class="form-control">
+                    <option value="">Select Start Station</option>
+                    @foreach (var station in Model.Stations)
+                    {
+                        <option value="@station.id">@station.commonName</option>
+                    }
+                </select>
+            </div>
+
+            <!-- Destination -->
+            <div class="mb-3">
+                <label>Destination</label>
+                <input asp-for="Destination" class="form-control" placeholder="e.g. Abbey Wood" />
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Search</button>
+
+        </form>
+
+        <!-- Error -->
+        @if (Model.errorMessage != null)
+        {
+            <div class="alert alert-danger mt-3">
+                @Model.errorMessage
+            </div>
+        }
+
+        <!-- Results -->
+        @if (Model.Results.Count > 0)
+        {
+            <h4 class="mt-4">Available Trains</h4>
+
+            @foreach (var train in Model.Results)
+            {
+                <div class="card p-3 mb-2">
+
+                    <b>@train.destinationName</b><br />
+
+                    <span>
+                        @(train.timeToStation <= 0 
+                            ? "At station now" 
+                            : "Arrives at " + Model.GetArrivalTime(train.timeToStation))
+                    </span>
+
+                    <!-- ✅ FIXED BUTTON -->
+                    <a asp-page="/TrainDetails"
+                       asp-route-start="@Model.GetStationName(Model.StartId)"
+                       asp-route-dest="@train.destinationName"
+                       asp-route-time="@train.timeToStation"
+                       class="btn btn-sm btn-outline-primary mt-2">
+                        View Details
+                    </a>
+
+                </div>
+            }
+        }
+
+    </div>
+
+</div>

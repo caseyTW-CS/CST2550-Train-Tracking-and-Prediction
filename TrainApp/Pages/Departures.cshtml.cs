@@ -8,14 +8,17 @@ namespace TrainApp.Pages
     {
         public class Train
         {
-            public string destination { get; set; }
-            public string departureTime { get; set; }
-            public string platform { get; set; }
+            public string? destination { get; set; }
+            public string? departureTime { get; set; }
+            public string? platform { get; set; }
         }
 
         public List<Train> results { get; set; } = new List<Train>();
 
-        public string searchedStation { get; set; }
+        public string? searchedStation { get; set; }
+
+        [BindProperty]
+        public string? stationName { get; set; }  
 
         private string connectionString = "Data Source=TrainApp.db";
 
@@ -23,8 +26,14 @@ namespace TrainApp.Pages
         {
         }
 
-        public void OnPost(string stationName)
+        public void OnPost()
         {
+            if (string.IsNullOrEmpty(stationName))
+            {
+                Console.WriteLine("stationName is NULL");
+                return;
+            }
+
             searchedStation = stationName;
 
             using (var conn = new SqliteConnection(connectionString))
@@ -33,8 +42,8 @@ namespace TrainApp.Pages
 
                 var cmd = new SqliteCommand(
                     @"SELECT destination, departureTime, platform 
-                  FROM trainSchedule 
-                  WHERE stationName = @station", conn);
+                      FROM trainSchedule 
+                      WHERE stationName = @station", conn);
 
                 cmd.Parameters.AddWithValue("@station", stationName);
 
@@ -44,14 +53,13 @@ namespace TrainApp.Pages
                     {
                         results.Add(new Train
                         {
-                            destination = reader["destination"].ToString(),
-                            departureTime = reader["departureTime"].ToString(),
-                            platform = reader["platform"].ToString()
+                            destination = reader["destination"]?.ToString(),
+                            departureTime = reader["departureTime"]?.ToString(),
+                            platform = reader["platform"]?.ToString()
                         });
                     }
                 }
             }
         }
     }
-
 }

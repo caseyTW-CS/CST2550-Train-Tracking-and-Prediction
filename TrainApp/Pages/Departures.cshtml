@@ -15,40 +15,46 @@ ViewData["Title"] = "Departures";
 <h2 class="text-center departures-title mb-2">Departures</h2>
 <p class="text-center text-muted mb-4">Check upcoming trains at any Elizabeth Line station</p>
 
-    <!-- search box -->
-    <form method="post">
-        <div class="input-group mb-3">
-            <input type="text" class="form-control" name="stationName" placeholder="Enter station (e.g. Paddington)" />
-            <button class="btn btn-primary">Search</button>
-        </div>
-    </form>
+<!-- search box -->
+<form method="post">
+    <div class="input-group mb-3">
+        <input type="text" class="form-control" name="stationName" placeholder="Enter station (e.g. Paddington)" />
+        <button class="btn btn-primary">Search</button>
+    </div>
+</form>
 
-    <!-- results -->
-    @if (Model.results != null && Model.results.Count > 0)
-    {
-        <table class="table table-striped">
-            <thead>
+<!-- searched station display -->
+@if (Model.searchedStation != null)
+{
+    <div class="alert alert-info text-center">
+        Departures from <strong>@Model.searchedStation</strong>
+    </div>
+}
+
+<!-- results -->
+@if (Model.results != null && Model.results.Count > 0)
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Destination</th>
+                <th>Time</th>
+                <th>Platform</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var train in Model.results)
+            {
                 <tr>
-                    <th>Destination</th>
-                    <th>Time</th>
-                    <th>Platform</th>
+                    <td>@train.destination</td>
+                    <td>@train.departureTime</td>
+                    <td>@train.platform</td>
                 </tr>
-            </thead>
-            <tbody>
-                @foreach (var train in Model.results)
-                {
-                    <tr>
-                        <td>@train.destination</td>
-                        <td>@train.departureTime</td>
-                        <td>@train.platform</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
-    else if (Model.searchedStation != null)
-    {
-        <p class="text-danger text-center">No trains found for this station</p>
-    }
-
-</div>
+            }
+        </tbody>
+    </table>
+}
+else if (Model.searchedStation != null)
+{
+    <p class="text-danger text-center">No trains found for this station</p>
+}

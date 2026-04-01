@@ -1,7 +1,7 @@
 @page
 @model TrainApp.Pages.DeparturesModel
 @{
-ViewData["Title"] = "Departures";
+    ViewData["Title"] = "Departures";
 }
 
 <style>
@@ -10,12 +10,17 @@ ViewData["Title"] = "Departures";
         font-size: 2.2rem;
         color: #1a2f5a;
     }
+
+    .section-title {
+        font-family: 'Dancing Script', cursive;
+        font-size: 1.8rem;
+        color: #1a2f5a;
+    }
 </style>
 
-<h2 class="text-center departures-title mb-2">Departures</h2>
+<h2 class="text-center departures-title mb-2">Departures & Arrivals</h2>
 <p class="text-center text-muted mb-4">Check upcoming trains at any Elizabeth Line station</p>
 
-<!-- search box -->
 <form method="post">
     <div class="input-group mb-3">
         <input type="text" class="form-control" name="stationName" placeholder="Enter station (e.g. Paddington)" />
@@ -23,17 +28,17 @@ ViewData["Title"] = "Departures";
     </div>
 </form>
 
-<!-- searched station display -->
 @if (Model.searchedStation != null)
 {
     <div class="alert alert-info text-center">
-        Departures from <strong>@Model.searchedStation</strong>
+        Trains for <strong>@Model.searchedStation</strong>
     </div>
 }
 
-<!-- results -->
 @if (Model.results != null && Model.results.Count > 0)
 {
+    <h3 class="text-center section-title mt-4 mb-3">Departures</h3>
+
     <table class="table table-striped">
         <thead>
             <tr>
@@ -56,5 +61,34 @@ ViewData["Title"] = "Departures";
 }
 else if (Model.searchedStation != null)
 {
-    <p class="text-danger text-center">No trains found for this station</p>
+    <p class="text-danger text-center">No departures found for this station</p>
+}
+
+@if (Model.arrivals != null && Model.arrivals.Count > 0)
+{
+    <h3 class="text-center section-title mt-5 mb-3">Arrivals</h3>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>From</th>
+                <th>Time</th>
+                <th>Platform</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var train in Model.arrivals)
+            {
+                <tr>
+                    <td>@train.origin</td>
+                    <td>@train.arrivalTime</td>
+                    <td>@train.platform</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else if (Model.searchedStation != null)
+{
+    <p class="text-danger text-center">No arrivals found for this station</p>
 }

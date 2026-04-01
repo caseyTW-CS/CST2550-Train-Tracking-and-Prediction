@@ -74,3 +74,54 @@ body {
     left: 50% !important;
     transform: translateX(-50%);
 }
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+}
+
+.modal-box {
+    background: white;
+    padding: 25px;
+    border-radius: 16px;
+    width: 300px;
+    text-align: center;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+
+.modal-actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.modal-cancel {
+    flex: 1;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    background: #ddd;
+}
+
+.modal-confirm {
+    flex: 1;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    background: #e74c3c;
+    color: white;
+    font-weight: 600;
+}
+
+    .modal-confirm:hover {
+        background: #d63c2d;
+    }

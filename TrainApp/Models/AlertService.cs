@@ -5,17 +5,13 @@ namespace TrainApp.Models
 {
     public class AlertService
     {
-        //PROPERTIES
-        // stores all active alerts
         public List<string> activeAlerts { get; private set; }
 
-        //METHODS
         public AlertService()
         {
             activeAlerts = new List<string>();
         }
 
-        // triggers an alert when a train is approaching a station
         public string trainApproachingAlert(TrainPosition trainPosition)
         {
             double minutesLeft = trainPosition.minutesUntilNextStation();
@@ -30,7 +26,6 @@ namespace TrainApp.Models
             return null;
         }
 
-        // triggers an alert when a delay is detected on a journey
         public string delayAlert(Journey journey)
         {
             if (journey.currentDelayMinutes > 0)
@@ -46,18 +41,15 @@ namespace TrainApp.Models
             return null;
         }
 
-        // clears all active alerts
         public void clearAlerts()
         {
             activeAlerts.Clear();
         }
 
-        // prints all active alerts
         public void displayAllAlerts()
         {
             if (activeAlerts.Count == 0)
             {
-                //Console.WriteLine("No active alerts.");
                 return;
             }
             foreach (string alert in activeAlerts)

@@ -26,11 +26,29 @@ namespace TrainApp.Pages
         private List<string> stationOrder = new List<string>
         {
             "reading",
+            "twyford",
+            "maidenhead",
+            "taplow",
+            "burnham",
+            "slough",
+            "langley",
+            "iver",
+            "west drayton",
+            "hayes & harlington",
+            "southall",
+            "hanwell",
+            "west ealing",
+            "ealing broadway",
+            "acton main line",
             "paddington",
             "bond street",
             "tottenham court road",
+            "farringdon",
             "liverpool street",
             "whitechapel",
+            "canary wharf",
+            "custom house",
+            "woolwich",
             "abbey wood"
         };
 
@@ -50,8 +68,8 @@ namespace TrainApp.Pages
                 return;
             }
 
-            string startName = GetStationName(StartId).ToLower();
-            string destinationName = Destination.ToLower();
+            string startName = GetStationName(StartId).Trim().ToLower();
+            string destinationName = Destination.Trim().ToLower();
 
             int startIndex = stationOrder.IndexOf(startName);
             int endIndex = stationOrder.IndexOf(destinationName);
@@ -85,21 +103,18 @@ namespace TrainApp.Pages
                 {
                     if (!string.IsNullOrEmpty(train.destinationName))
                     {
-                        string dest = train.destinationName.ToLower();
+                        string dest = train.destinationName.Trim().ToLower();
 
                         int trainIndex = stationOrder.FindIndex(s => dest.Contains(s));
 
-                        if (trainIndex >= endIndex)
+                        if (trainIndex != -1 && trainIndex >= endIndex)
                         {
                             Results.Add(train);
                         }
                     }
                 }
 
-                // ✅ SORT
                 Results = Results.OrderBy(t => t.timeToStation).ToList();
-
-                // ✅ LIMIT
                 Results = Results.Take(10).ToList();
 
                 if (Results.Count == 0)
@@ -132,7 +147,6 @@ namespace TrainApp.Pages
             return "";
         }
 
-        // ✅ NEW: Convert seconds → clock time
         public string GetArrivalTime(int seconds)
         {
             if (seconds <= 0)

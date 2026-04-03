@@ -5,6 +5,10 @@
 }
 
 <style>
+    body {
+        background-color: #a8d4e8;
+    }
+
     .departures-title {
         font-family: 'Dancing Script', cursive;
         font-size: 2.2rem;
@@ -15,6 +19,40 @@
         font-family: 'Dancing Script', cursive;
         font-size: 1.8rem;
         color: #1a2f5a;
+    }
+
+    .table {
+        background: #0b1e3c;
+        color: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    }
+
+    .table th {
+        background: #111;
+        color: #00e5ff;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+    }
+
+    .table tr:hover {
+        background: rgba(0,229,255,0.08);
+    }
+
+    .table tbody tr:first-child {
+        background: rgba(0,255,140,0.15);
+        font-weight: 600;
+    }
+
+    .due {
+        color: #00ffcc;
+        font-weight: bold;
+        animation: pulse 1s infinite;
+    }
+
+    @@keyframes pulse {
+        50% { opacity: 0.4; }
     }
 </style>
 
@@ -28,16 +66,18 @@
     </div>
 </form>
 
+<p class="text-muted text-center" style="font-size: 0.9rem;">
+    Some stations may not return live data due to TfL API limitations.
+</p>
+
 @if (Model.searchedStation != null)
 {
     <div class="alert alert-info text-center">
         Trains for <strong>@Model.searchedStation</strong>
     </div>
-}
 
-@if (Model.results != null && Model.results.Count > 0)
-{
-    <h3 class="text-center section-title mt-4 mb-3">Departures</h3>
+    <!-- 🔥 ALWAYS SHOW TABLE NOW -->
+    <h3 class="text-center section-title mt-4 mb-3">Live Trains</h3>
 
     <table class="table table-striped">
         <thead>
@@ -47,48 +87,55 @@
                 <th>Platform</th>
             </tr>
         </thead>
-        <tbody>
-            @foreach (var train in Model.results)
-            {
-                <tr>
-                    <td>@train.destination</td>
-                    <td>@train.departureTime</td>
-                    <td>@train.platform</td>
-                </tr>
-            }
+        <tbody id="departuresBody">
+            <!-- JS fills this -->
         </tbody>
     </table>
 }
-else if (Model.searchedStation != null)
-{
-    <p class="text-danger text-center">No departures found for this station</p>
-}
 
-@if (Model.arrivals != null && Model.arrivals.Count > 0)
-{
-    <h3 class="text-center section-title mt-5 mb-3">Arrivals</h3>
+@section Scripts {
+<script>
+    let currentStation = "@Model.searchedStation";
 
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>From</th>
-                <th>Time</th>
-                <th>Platform</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var train in Model.arrivals)
-            {
+    async function refreshData() {
+        if (!currentStation) return;
+
+        const res = await fetch(`?handler=Data&station=${currentStation}`);
+        const data = await res.json();
+
+        const table = document.getElementById("departuresBody");
+        if (!table) return;
+
+        table.innerHTML = "";
+
+        if (data.length === 0) {
+            table.innerHTML = `
                 <tr>
-                    <td>@train.origin</td>
-                    <td>@train.arrivalTime</td>
-                    <td>@train.platform</td>
+                    <td colspan="3" style="text-align:center; color:#ff6b6b;">
+                        No trains found
+                    </td>
                 </tr>
-            }
-        </tbody>
-    </table>
-}
-else if (Model.searchedStation != null)
-{
-    <p class="text-danger text-center">No arrivals found for this station</p>
+            `;
+            return;
+        }
+
+        data.forEach(train => {
+            const isDue = train.departureTime === "Due";
+
+            table.innerHTML += `
+                <tr>
+                    <td>${train.destination}</td>
+                    <td class="${isDue ? "due" : ""}">${train.departureTime}</td>
+                    <td><span class="badge bg-dark">${train.platform}</span></td>
+                </tr>
+            `;
+        });
+    }
+
+    // run immediately after search
+    refreshData();
+
+    // auto refresh like real boards
+    setInterval(refreshData, 15000);
+</script>
 }

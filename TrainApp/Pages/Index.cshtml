@@ -220,10 +220,13 @@
 <!-- SERVICE STATUS (UNCHANGED) -->
 <div class="service-status">
     <div>
-        <span class="status-dot"></span>
+        <span class="status-dot" id="homeStatusDot"></span>
         <span class="status-text">Live Service Status</span>
     </div>
-    <p class="status-sub">Elizabeth Line: Good Service</p>
+
+    <p class="status-sub" id="homeStatusText">
+        Loading service status...
+    </p>
 </div>
 
 <!-- FEATURE CARDS (UPDATED PURPOSE) -->
@@ -292,4 +295,57 @@
             document.getElementById('weatherDesc').textContent = 'Weather unavailable';
             document.getElementById('weatherTemp').textContent = '--\u00B0';
         });
+</script>
+
+<script>
+async function loadStatus() {
+    try {
+        const res = await fetch("https://api.tfl.gov.uk/Line/elizabeth/Status");
+        const data = await res.json();
+
+        const status = data[0]?.lineStatuses?.[0]?.statusSeverityDescription ?? "Good Service";
+
+        const el = document.getElementById("serviceStatus");
+
+        if (!el) return;
+
+        if (status.includes("Good")) {
+            el.innerHTML = "● Good Service";
+            el.style.color = "green";
+        }
+        else if (status.includes("Minor")) {
+            el.innerHTML = "● Minor Delays";
+            el.style.color = "orange";
+        }
+        else {
+            el.innerHTML = "● Severe Delays";
+            el.style.color = "red";
+        }
+
+        // ALSO update homepage dot if exists
+        const homeText = document.getElementById("homeStatusText");
+        const homeDot = document.getElementById("homeStatusDot");
+
+        if (homeText && homeDot) {
+            homeText.textContent = "Elizabeth Line: " + status;
+
+            if (status.includes("Good")) {
+                homeDot.style.backgroundColor = "green";
+                homeText.style.color = "green";
+            } else if (status.includes("Minor")) {
+                homeDot.style.backgroundColor = "orange";
+                homeText.style.color = "orange";
+            } else {
+                homeDot.style.backgroundColor = "red";
+                homeText.style.color = "red";
+            }
+        }
+
+    } catch {
+        document.getElementById("serviceStatus").innerHTML = "● Unknown";
+    }
+}
+
+loadStatus();
+setInterval(loadStatus, 30000);
 </script>

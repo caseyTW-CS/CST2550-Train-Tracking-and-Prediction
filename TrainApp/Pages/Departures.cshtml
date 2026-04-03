@@ -66,8 +66,8 @@
     </div>
 </form>
 
-<p class="text-muted text-center" style="font-size: 0.9rem;">
-    Some stations may not return live data due to TfL API limitations.
+<p class="text-center mb-4" style="font-size: 0.85rem; color: #d9534f; font-weight: 600;">
+    ⚠️ Some stations may not return live data due to TfL API limitations.
 </p>
 
 @if (Model.searchedStation != null)
@@ -76,7 +76,7 @@
         Trains for <strong>@Model.searchedStation</strong>
     </div>
 
-    <!-- 🔥 ALWAYS SHOW TABLE NOW -->
+    <!-- ALWAYS SHOW TABLE NOW -->
     <h3 class="text-center section-title mt-4 mb-3">Live Trains</h3>
 
     <table class="table table-striped">

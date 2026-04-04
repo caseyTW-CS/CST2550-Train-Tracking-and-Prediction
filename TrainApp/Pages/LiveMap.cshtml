@@ -149,9 +149,41 @@
             flex: 1;
             height: 100vh;
         }
+
+        /* 🔙 navigation arrows */
+.nav-btn {
+    position: fixed;
+    top: 15px;
+    z-index: 2000;
+    background: rgba(75, 78, 109, 0.9);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.nav-btn:hover {
+    background: #3a3d58;
+}
+
+/* left + right positions */
+.back-btn {
+    left: 15px;
+}
+
+.forward-btn {
+    right: 15px;
+}
+
     </style>
 </head>
 <body>
+    <button class="nav-btn back-btn" id="backBtn">←</button>
+<button class="nav-btn forward-btn" id="nextBtn">→</button>
 
 <div class="page-wrap">
 
@@ -355,6 +387,26 @@
 
     // refresh page every 30 seconds to get fresh train data
     setTimeout(() => location.reload(), 30000);
+
+// 🔙 navigation buttons (SAFE VERSION)
+document.addEventListener("DOMContentLoaded", () => {
+
+    const backBtn = document.getElementById("backBtn");
+    const nextBtn = document.getElementById("nextBtn");
+
+    if (backBtn) {
+        backBtn.addEventListener("click", () => {
+            window.location.href = "/";
+        });
+    }
+
+    if (nextBtn) {
+        nextBtn.addEventListener("click", () => {
+            window.location.href = "/Departures";
+        });
+    }
+
+});
 </script>
 
 </body>

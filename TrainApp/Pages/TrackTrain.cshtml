@@ -1,134 +1,346 @@
 @page "{id:int}"
 @model TrainApp.Pages.TrackTrainModel
+@{
+    Layout = null;
+}
 
-<style>
-    .map-container {
-        max-width: 900px;
-        margin: 40px auto;
-        text-align: center;
-    }
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Track Train</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    .line {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin: 40px 0;
-        position: relative;
-    }
-
-    .line::before {
-        content: "";
-        position: absolute;
-        top: 50%;
-        left: 0;
-        right: 0;
-        height: 6px;
-        background-color: #6a1b9a;
-        z-index: 0;
-    }
-
-    .station {
-        position: relative;
-        z-index: 1;
-        text-align: center;
-    }
-
-    .dot {
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        background-color: #ccc;
-        margin: 0 auto;
-    }
-
-    .current .dot {
-        background-color: green;
-        transform: scale(1.3);
-    }
-
-    .next .dot {
-        background-color: orange;
-    }
-
-    .label {
-        margin-top: 8px;
-        font-size: 12px;
-    }
-
-    .train-icon {
-        font-size: 22px;
-        margin-top: 5px;
-    }
-
-    .info-box {
-        margin-top: 20px;
-        padding: 15px;
-        background: #f5f5f5;
-        border-radius: 10px;
-    }
-
-    .arrivals {
-        margin-top: 30px;
-        text-align: left;
-    }
-
-    .arrival-item {
-        padding: 10px;
-        border-bottom: 1px solid #ddd;
-    }
-</style>
-
-<div class="map-container">
-
-    <h2>@Model.trainName</h2>
-    <p>@Model.start → @Model.end</p>
-
-    <!-- Train line -->
-    <div class="line">
-        @foreach (var stop in Model.route)
-        {
-            var cssClass = "";
-            if (stop == Model.currentStation) cssClass = "current";
-            else if (stop == Model.nextStation) cssClass = "next";
-
-            <div class="station @cssClass">
-                <div class="dot"></div>
-
-                @if (stop == Model.currentStation)
-                {
-                    <div class="train-icon">🚆</div>
-                }
-
-                <div class="label">@stop</div>
-            </div>
+        html, body {
+            height: 100%;
+            font-family: 'Segoe UI', sans-serif;
         }
-    </div>
 
-    <!-- Status -->
-    <div class="info-box">
-        <b>Status:</b> @Model.status <br />
-        <b>Current:</b> @Model.currentStation <br />
-        <b>Next:</b> @Model.nextStation
-    </div>
-
-    <!-- Live Arrivals -->
-    <div class="arrivals">
-        <h3>Live Elizabeth Line Arrivals</h3>
-
-        @foreach (var train in Model.arrivals)
-        {
-            <div class="arrival-item">
-                <b>@train.destinationName</b> <br />
-                Station: @train.stationName <br />
-                Arrival: @(train.timeToStation / 60) mins
-            </div>
+        /* split the page into left panel and right map */
+        .page-wrap {
+            display: flex;
+            height: 100vh;
         }
+
+        /* left info panel */
+        .left-panel {
+            width: 300px;
+            flex-shrink: 0;
+            background: white;
+            height: 100vh;
+            overflow-y: auto;
+            box-shadow: 3px 0 15px rgba(0,0,0,0.1);
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* dark header at the top of the panel */
+        .panel-header {
+            padding: 1.5rem;
+            background: #4B4E6D;
+            color: white;
+            text-align: center;
+        }
+
+        .panel-header h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.2rem;
+        }
+
+        .panel-header p {
+            font-size: 0.82rem;
+            opacity: 0.8;
+        }
+
+        /* train status box */
+        .status-box {
+            padding: 1.2rem;
+            border-bottom: 1px solid #e8edf8;
+        }
+
+        .status-box h3 {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #8a90b0;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.8rem;
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid #f0f5fc;
+            color: #2c2f4a;
+        }
+
+        .status-row span:first-child {
+            color: #8a90b0;
+        }
+
+        .status-row span:last-child {
+            font-weight: 600;
+        }
+
+        /* route stops list */
+        .route-box {
+            padding: 1.2rem;
+            flex: 1;
+        }
+
+        .route-box h3 {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #8a90b0;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.8rem;
+        }
+
+        .stop-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.5rem 0;
+            font-size: 0.85rem;
+            color: #2c2f4a;
+            border-bottom: 1px solid #f0f5fc;
+        }
+
+        .stop-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #c5d5e8;
+            flex-shrink: 0;
+        }
+
+        /* highlight current and next station */
+        .stop-item.current .stop-dot { background: #2eaa6e; }
+        .stop-item.current span { font-weight: 700; color: #2eaa6e; }
+        .stop-item.next .stop-dot { background: #d4820a; }
+        .stop-item.next span { font-weight: 600; color: #d4820a; }
+
+        /* live arrivals section */
+        .arrivals-box {
+            padding: 1.2rem;
+            border-top: 1px solid #e8edf8;
+        }
+
+        .arrivals-box h3 {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #8a90b0;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.8rem;
+        }
+
+        .arrival-item {
+            background: #f4f8fd;
+            border-radius: 8px;
+            padding: 0.7rem 0.9rem;
+            margin-bottom: 8px;
+            font-size: 0.82rem;
+            border-left: 3px solid #6950a1;
+            color: #2c2f4a;
+        }
+
+        .arrival-item b { color: #1a2f5a; }
+
+        /* map fills the rest of the page */
+        #map {
+            flex: 1;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-wrap">
+
+    <!-- LEFT PANEL -->
+    <div class="left-panel">
+
+        <!-- train name and route header -->
+        <div class="panel-header">
+            <h2>🚆 @Model.trainName</h2>
+            <p>@Model.start → @Model.end</p>
+        </div>
+
+        <!-- current status -->
+        <div class="status-box">
+            <h3>Status</h3>
+            <div class="status-row">
+                <span>Status</span>
+                <span>@Model.status</span>
+            </div>
+            <div class="status-row">
+                <span>Current Station</span>
+                <span>@Model.currentStation</span>
+            </div>
+            <div class="status-row">
+                <span>Next Station</span>
+                <span>@Model.nextStation</span>
+            </div>
+        </div>
+
+        <!-- list of stops on this route -->
+        <div class="route-box">
+            <h3>Route Stops</h3>
+            @foreach (var stop in Model.route)
+            {
+                var cssClass = "";
+                if (stop == Model.currentStation) cssClass = "current";
+                else if (stop == Model.nextStation) cssClass = "next";
+
+                <div class="stop-item @cssClass">
+                    <div class="stop-dot"></div>
+                    <span>@stop</span>
+                </div>
+            }
+        </div>
+
+        <!-- live tfl arrivals -->
+        <div class="arrivals-box">
+            <h3>Live Arrivals</h3>
+            @foreach (var train in Model.arrivals)
+            {
+                <div class="arrival-item">
+                    <b>@train.destinationName</b><br />
+                    <span>@train.stationName — @(train.timeToStation / 60) mins</span>
+                </div>
+            }
+        </div>
+
     </div>
+
+    <!-- MAP -->
+    <div id="map"></div>
 
 </div>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
+    // elizabeth line stations with real coordinates
+    const elizabethStations = [
+        { name: "Reading",              lat: 51.4587, lng: -0.9719 },
+        { name: "Twyford",              lat: 51.4754, lng: -0.8614 },
+        { name: "Maidenhead",           lat: 51.5183, lng: -0.7177 },
+        { name: "Slough",               lat: 51.5113, lng: -0.5950 },
+        { name: "West Drayton",         lat: 51.5096, lng: -0.4472 },
+        { name: "Hayes & Harlington",   lat: 51.5069, lng: -0.4225 },
+        { name: "Southall",             lat: 51.5057, lng: -0.3776 },
+        { name: "Ealing Broadway",      lat: 51.5152, lng: -0.3017 },
+        { name: "Paddington",           lat: 51.5154, lng: -0.1755 },
+        { name: "Bond Street",          lat: 51.5142, lng: -0.1494 },
+        { name: "Tottenham Court Road", lat: 51.5165, lng: -0.1299 },
+        { name: "Farringdon",           lat: 51.5203, lng: -0.1051 },
+        { name: "Liverpool Street",     lat: 51.5183, lng: -0.0823 },
+        { name: "Whitechapel",          lat: 51.5197, lng: -0.0594 },
+        { name: "Stratford",            lat: 51.5416, lng: -0.0042 },
+        { name: "Romford",              lat: 51.5752, lng:  0.1833 },
+        { name: "Shenfield",            lat: 51.6297, lng:  0.3267 },
+        { name: "Shadwell",             lat: 51.5113, lng: -0.0569 },
+        { name: "Canada Water",         lat: 51.4982, lng: -0.0502 },
+        { name: "Abbey Wood",           lat: 51.4908, lng:  0.1198 }
+    ];
+
+    // set up leaflet map centred on london
+    const map = L.map('map').setView([51.509, -0.118], 11);
+
+    // load map tiles from openstreetmap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // draw the elizabeth line as a purple line
+    const routeCoords = elizabethStations.map(s => [s.lat, s.lng]);
+    L.polyline(routeCoords, { color: '#6950a1', weight: 4, opacity: 0.8 }).addTo(map);
+
+    // add a dot for each station
+    elizabethStations.forEach(s => {
+        L.circleMarker([s.lat, s.lng], {
+            radius: 5,
+            color: '#6950a1',
+            fillColor: 'white',
+            fillOpacity: 1,
+            weight: 2
+        }).addTo(map).bindPopup(s.name);
+    });
+
+    // get the current and next station from the backend
+    const currentStation = '@Model.currentStation';
+    const nextStation = '@Model.nextStation';
+
+    // highlight current station in green on the map
+    const current = elizabethStations.find(s =>
+        currentStation.toLowerCase().includes(s.name.toLowerCase())
+    );
+    if (current) {
+        L.circleMarker([current.lat, current.lng], {
+            radius: 10,
+            color: '#2eaa6e',
+            fillColor: '#2eaa6e',
+            fillOpacity: 0.8,
+            weight: 2
+        }).addTo(map).bindPopup(`🚆 Train is here: ${current.name}`).openPopup();
+
+        // zoom the map to the current station
+        map.setView([current.lat, current.lng], 13);
+    }
+
+    // highlight next station in orange
+    const next = elizabethStations.find(s =>
+        nextStation.toLowerCase().includes(s.name.toLowerCase())
+    );
+    if (next) {
+        L.circleMarker([next.lat, next.lng], {
+            radius: 8,
+            color: '#d4820a',
+            fillColor: '#d4820a',
+            fillOpacity: 0.8,
+            weight: 2
+        }).addTo(map).bindPopup(`Next stop: ${next.name}`);
+    }
+
+    // place live tfl train markers on the map
+    @foreach (var train in Model.arrivals)
+    {
+        <text>
+        (function() {
+            const stn = '@train.stationName'
+                .replace(' Rail Station', '')
+                .replace(' Underground Station', '');
+            const match = elizabethStations.find(s =>
+                stn.toLowerCase().includes(s.name.toLowerCase())
+            );
+            if (match) {
+                const icon = L.divIcon({
+                    html: '🚂',
+                    className: '',
+                    iconSize: [24, 24],
+                    iconAnchor: [12, 12]
+                });
+                L.marker([match.lat, match.lng], { icon })
+                    .addTo(map)
+                    .bindPopup(`<b>@train.destinationName</b><br>Arrives in: @(train.timeToStation / 60) mins`);
+            }
+        })();
+        </text>
+    }
+
+    // auto reload page every 30 seconds to get fresh data
     setTimeout(function () {
         location.reload();
-    }, 5000);
+    }, 30000);
 </script>
+
+</body>
+</html>

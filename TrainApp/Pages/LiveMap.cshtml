@@ -1,0 +1,361 @@
+@page
+@model TrainApp.Pages.LiveMapModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Live Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html, body {
+            height: 100%;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        /* split page into left panel and right map */
+        .page-wrap {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* left search panel */
+        .left-panel {
+            width: 300px;
+            flex-shrink: 0;
+            background: white;
+            height: 100vh;
+            overflow-y: auto;
+            box-shadow: 3px 0 15px rgba(0,0,0,0.1);
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* dark header */
+        .panel-header {
+            padding: 1.5rem;
+            background: #4B4E6D;
+            color: white;
+            text-align: center;
+        }
+
+        .panel-header h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.2rem;
+        }
+
+        .panel-header p {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        /* search box */
+        .search-box {
+            padding: 1.2rem;
+            border-bottom: 1px solid #e8edf8;
+        }
+
+        .search-box label {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #4B4E6D;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1.5px solid #c5d5e8;
+            border-radius: 8px;
+            background: #f0f6fb;
+            font-size: 0.88rem;
+            color: #2c2f4a;
+            margin-bottom: 10px;
+        }
+
+        .search-box button {
+            width: 100%;
+            padding: 10px;
+            background: #4B4E6D;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.92rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .search-box button:hover {
+            background: #3a3d58;
+        }
+
+        /* train results */
+        .results-section {
+            padding: 1rem;
+            flex: 1;
+        }
+
+        .results-title {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #8a90b0;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.8rem;
+        }
+
+        .train-item {
+            background: #f4f8fd;
+            border-radius: 10px;
+            padding: 0.9rem 1rem;
+            margin-bottom: 10px;
+            border-left: 3px solid #6950a1;
+            cursor: pointer;
+        }
+
+        .train-item:hover {
+            background: #e8f0fb;
+        }
+
+        .train-item b {
+            color: #1a2f5a;
+            font-size: 0.88rem;
+        }
+
+        .train-item span {
+            display: block;
+            font-size: 0.78rem;
+            color: #6a7a9a;
+            margin-top: 3px;
+        }
+
+        .no-results {
+            text-align: center;
+            color: #9aaabb;
+            font-size: 0.88rem;
+            margin-top: 1rem;
+        }
+
+        /* map fills the rest */
+        #map {
+            flex: 1;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-wrap">
+
+    <!-- LEFT PANEL -->
+    <div class="left-panel">
+
+        <div class="panel-header">
+            <h2>🗺️ Live Map</h2>
+            <p>Track live trains on the Elizabeth Line</p>
+        </div>
+
+        <!-- search box -->
+        <div class="search-box">
+            <label>Search by Station or Train ID</label>
+            <input type="text" id="searchInput" placeholder="e.g. Paddington or 123" />
+            <button onclick="searchTrain()">&#128269; Search</button>
+        </div>
+
+        <!-- results list -->
+        <div class="results-section">
+            <div class="results-title" id="resultsTitle">All Live Trains</div>
+            <div id="resultsList"></div>
+        </div>
+
+    </div>
+
+    <!-- MAP -->
+    <div id="map"></div>
+
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    // all live trains passed from the backend
+    const allTrains = [
+        @foreach (var train in Model.trains)
+        {
+            <text>
+            {
+                vehicleId: "@train.vehicleId",
+                stationName: "@(train.stationName?.Replace("\"", "")?.Replace(" Rail Station", "")?.Replace(" Underground Station", ""))",
+                destinationName: "@(train.destinationName?.Replace("\"", "")?.Replace(" Rail Station", ""))",
+                timeToStation: @train.timeToStation,
+                currentLocation: "@train.currentLocation",
+                platformName: "@train.platformName"
+            },
+            </text>
+        }
+    ];
+
+    // elizabeth line stations with coordinates
+    const elizabethStations = [
+        { name: "Reading",              lat: 51.4587, lng: -0.9719 },
+        { name: "Twyford",              lat: 51.4754, lng: -0.8614 },
+        { name: "Maidenhead",           lat: 51.5183, lng: -0.7177 },
+        { name: "Slough",               lat: 51.5113, lng: -0.5950 },
+        { name: "West Drayton",         lat: 51.5096, lng: -0.4472 },
+        { name: "Hayes & Harlington",   lat: 51.5069, lng: -0.4225 },
+        { name: "Southall",             lat: 51.5057, lng: -0.3776 },
+        { name: "Ealing Broadway",      lat: 51.5152, lng: -0.3017 },
+        { name: "Paddington",           lat: 51.5154, lng: -0.1755 },
+        { name: "Bond Street",          lat: 51.5142, lng: -0.1494 },
+        { name: "Tottenham Court Road", lat: 51.5165, lng: -0.1299 },
+        { name: "Farringdon",           lat: 51.5203, lng: -0.1051 },
+        { name: "Liverpool Street",     lat: 51.5183, lng: -0.0823 },
+        { name: "Whitechapel",          lat: 51.5197, lng: -0.0594 },
+        { name: "Stratford",            lat: 51.5416, lng: -0.0042 },
+        { name: "Romford",              lat: 51.5752, lng:  0.1833 },
+        { name: "Shenfield",            lat: 51.6297, lng:  0.3267 },
+        { name: "Shadwell",             lat: 51.5113, lng: -0.0569 },
+        { name: "Canada Water",         lat: 51.4982, lng: -0.0502 },
+        { name: "Abbey Wood",           lat: 51.4908, lng:  0.1198 }
+    ];
+
+    // set up map centred on london
+    const map = L.map('map').setView([51.509, -0.118], 11);
+
+    // load openstreetmap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // draw the elizabeth line route as a purple line
+    const routeCoords = elizabethStations.map(s => [s.lat, s.lng]);
+    L.polyline(routeCoords, { color: '#6950a1', weight: 4, opacity: 0.8 }).addTo(map);
+
+    // add station dots on the map
+    elizabethStations.forEach(s => {
+        L.circleMarker([s.lat, s.lng], {
+            radius: 5,
+            color: '#6950a1',
+            fillColor: 'white',
+            fillOpacity: 1,
+            weight: 2
+        }).addTo(map).bindPopup(s.name);
+    });
+
+    // layer group for train markers so we can clear and redraw
+    let trainLayer = L.layerGroup().addTo(map);
+
+    // draw train markers on the map for a given list of trains
+    function drawTrains(trains) {
+        trainLayer.clearLayers();
+        trains.forEach(t => {
+            const match = elizabethStations.find(s =>
+                t.stationName.toLowerCase().includes(s.name.toLowerCase())
+            );
+            if (match) {
+                const mins = Math.round(t.timeToStation / 60);
+                const icon = L.divIcon({
+                    html: '🚂',
+                    className: '',
+                    iconSize: [24, 24],
+                    iconAnchor: [12, 12]
+                });
+                L.marker([match.lat, match.lng], { icon })
+                    .addTo(trainLayer)
+                    .bindPopup(`
+                        <b>Train ${t.vehicleId}</b><br>
+                        To: ${t.destinationName}<br>
+                        Next stop: ${t.stationName}<br>
+                        Arrives in: ${mins} mins<br>
+                        Platform: ${t.platformName || '--'}
+                    `);
+            }
+        });
+    }
+
+    // show train cards in the left panel
+    function showResults(trains) {
+        const list = document.getElementById('resultsList');
+        const title = document.getElementById('resultsTitle');
+
+        if (trains.length === 0) {
+            list.innerHTML = '<div class="no-results">No trains found</div>';
+            title.textContent = '0 trains found';
+            return;
+        }
+
+        title.textContent = trains.length + ' train(s) found';
+        list.innerHTML = trains.map(t => {
+            const mins = Math.round(t.timeToStation / 60);
+            return `
+                <div class="train-item" onclick="zoomToTrain('${t.stationName}')">
+                    <b>🚂 ${t.vehicleId}</b>
+                    <span>To: ${t.destinationName}</span>
+                    <span>Next: ${t.stationName} in ${mins} mins</span>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // zoom map to a specific station when train card is clicked
+    function zoomToTrain(stationName) {
+    const match = elizabethStations.find(s =>
+        stationName.toLowerCase().includes(s.name.toLowerCase())
+    );
+    if (match) {
+        // zoom in closer and animate smoothly
+        map.flyTo([match.lat, match.lng], 15, {
+            animate: true,
+            duration: 1.2
+        });
+    }
+}
+
+    // filter trains by station name or train id
+    function searchTrain() {
+        const query = document.getElementById('searchInput').value.trim().toLowerCase();
+
+        if (query === '') {
+            // show all trains if search is empty
+            drawTrains(allTrains);
+            showResults(allTrains);
+            return;
+        }
+
+        const filtered = allTrains.filter(t =>
+            t.vehicleId.toLowerCase().includes(query) ||
+            t.stationName.toLowerCase().includes(query) ||
+            t.destinationName.toLowerCase().includes(query)
+        );
+
+        drawTrains(filtered);
+        showResults(filtered);
+
+        // zoom to first result if found
+        if (filtered.length > 0) {
+            zoomToTrain(filtered[0].stationName);
+        }
+    }
+
+    // allow pressing enter to search
+    document.getElementById('searchInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') searchTrain();
+    });
+
+    // load all trains on page open
+    drawTrains(allTrains);
+    showResults(allTrains);
+
+    // refresh page every 30 seconds to get fresh train data
+    setTimeout(() => location.reload(), 30000);
+</script>
+
+</body>
+</html>

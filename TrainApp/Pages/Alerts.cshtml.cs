@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,12 +11,12 @@ namespace TrainApp.Pages
 {
     public class AlertsModel : PageModel
     {
+        // used to call TfL API
         private readonly HttpClient _httpClient;
 
         public List<AlertDisplay> ActiveAlerts { get; set; } = new();
         public bool HasActiveDelays { get; set; }
         public DateTime LastUpdated { get; set; }
-        public bool EmailNotificationsEnabled { get; set; }
         public string ApiStatus { get; set; } = "";
 
         public AlertsModel()
@@ -25,12 +24,13 @@ namespace TrainApp.Pages
             _httpClient = new HttpClient();
         }
 
+        // runs when page loads
         public async Task OnGetAsync()
         {
             await LoadTfLAlerts();
-            LoadEmailPref();
         }
 
+        // get live alerts from TfL
         private async Task LoadTfLAlerts()
         {
             try
@@ -45,7 +45,12 @@ namespace TrainApp.Pages
                 }
 
                 var json = await response.Content.ReadAsStringAsync();
-                var lines = JsonSerializer.Deserialize<List<TfLLine>>(json);
+
+                var lines = JsonSerializer.Deserialize<List<TfLLine>>(json,
+                    new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
 
                 ActiveAlerts.Clear();
 
@@ -55,7 +60,8 @@ namespace TrainApp.Pages
                 {
                     foreach (var status in elizabeth.LineStatuses)
                     {
-                        if (!string.IsNullOrEmpty(status.Reason))
+                        // only add if there's actually a reason (delay info)
+                        if (!string.IsNullOrWhiteSpace(status.Reason))
                         {
                             var alert = new AlertDisplay
                             {
@@ -66,16 +72,15 @@ namespace TrainApp.Pages
                             };
 
                             ApplySeverity(alert);
-
                             ActiveAlerts.Add(alert);
                         }
                     }
-
-                    HasActiveDelays = ActiveAlerts.Any();
-                    ApiStatus = HasActiveDelays
-                        ? $"Live disruptions: {ActiveAlerts.Count}"
-                        : "Good Service";
                 }
+
+                HasActiveDelays = ActiveAlerts.Any();
+                ApiStatus = HasActiveDelays
+                    ? $"Live disruptions: {ActiveAlerts.Count}"
+                    : "Good Service";
             }
             catch
             {
@@ -85,43 +90,35 @@ namespace TrainApp.Pages
             LastUpdated = DateTime.Now;
         }
 
+        // decide how serious the alert is
         private void ApplySeverity(AlertDisplay alert)
         {
-            var text = alert.Description.ToLower();
+            var text = (alert.Description ?? "").ToLower();
 
             if (text.Contains("suspended") || text.Contains("closed"))
             {
                 alert.Severity = "Major";
-                alert.Icon = "fas fa-exclamation-triangle";
-                alert.SeverityClass = "severity-major";
-                alert.SeverityBadgeClass = "bg-danger";
             }
             else if (text.Contains("delay"))
             {
                 alert.Severity = "Moderate";
-                alert.Icon = "fas fa-exclamation-circle";
-                alert.SeverityClass = "severity-moderate";
-                alert.SeverityBadgeClass = "bg-warning text-dark";
             }
             else
             {
                 alert.Severity = "Info";
-                alert.Icon = "fas fa-info-circle";
-                alert.SeverityClass = "severity-info";
-                alert.SeverityBadgeClass = "bg-secondary";
             }
-
-            alert.Type = alert.Severity == "Info" ? "Info" : "Delay";
         }
 
+        // try to find station names from text
         private List<string> ExtractStations(string text)
         {
             var stations = new List<string>();
 
-            string[] knownStations = {
-                "Paddington", "Bond Street", "Tottenham Court Road", "Farringdon",
-                "Liverpool Street", "Whitechapel", "Stratford", "Canary Wharf",
-                "Woolwich", "Abbey Wood", "Reading", "Heathrow", "Shenfield"
+            string[] knownStations =
+            {
+                "Paddington", "Bond Street", "Farringdon",
+                "Liverpool Street", "Stratford", "Canary Wharf",
+                "Woolwich", "Abbey Wood", "Reading", "Heathrow"
             };
 
             foreach (var station in knownStations)
@@ -135,24 +132,7 @@ namespace TrainApp.Pages
             return stations;
         }
 
-        public async Task<IActionResult> OnPostRefreshAlerts()
-        {
-            await LoadTfLAlerts();
-            return RedirectToPage();
-        }
-
-        public IActionResult OnPostClearAlerts()
-        {
-            ActiveAlerts.Clear();
-            return RedirectToPage();
-        }
-
-        public IActionResult OnPostToggleEmail([FromBody] EmailToggleRequest request)
-        {
-            HttpContext.Session.SetString("EmailNotifications", request.Enabled.ToString());
-            return new JsonResult(new { success = true });
-        }
-
+        // used by JS to refresh alerts
         public async Task<IActionResult> OnGetGetActiveAlerts()
         {
             await LoadTfLAlerts();
@@ -166,15 +146,9 @@ namespace TrainApp.Pages
                 lastUpdated = LastUpdated.ToString("HH:mm:ss")
             });
         }
-
-        private void LoadEmailPref()
-        {
-            var pref = HttpContext.Session.GetString("EmailNotifications");
-            EmailNotificationsEnabled = pref == "True";
-        }
     }
 
-    // ✅ REAL TfL API model
+    // TfL response model
     public class TfLLine
     {
         public List<LineStatus>? LineStatuses { get; set; }
@@ -186,24 +160,15 @@ namespace TrainApp.Pages
         public string? Reason { get; set; }
     }
 
+    // what we show on UI
     public class AlertDisplay
     {
         public string Id { get; set; } = "";
         public string Description { get; set; } = "";
-        public string Type { get; set; } = "";
         public string Severity { get; set; } = "";
-        public string Icon { get; set; } = "";
-        public string SeverityClass { get; set; } = "";
-        public string SeverityBadgeClass { get; set; } = "";
         public DateTime ReportedAt { get; set; }
         public List<string> AffectedStations { get; set; } = new();
 
         public string TimeFormatted => ReportedAt.ToString("HH:mm");
-        public string DateFormatted => ReportedAt.ToString("dd MMM");
-    }
-
-    public class EmailToggleRequest
-    {
-        public bool Enabled { get; set; }
     }
 }

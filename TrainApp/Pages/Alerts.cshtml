@@ -71,20 +71,24 @@
     }
 
     .alert-route {
-        font-size: 1.15rem;
+        font-size: 1.05rem;
         font-weight: 600;
         color: #4a5f7e;
-        margin-bottom: 3px;
+        margin-bottom: 4px;
     }
 
     .alert-level {
-        font-size: 1.2rem;
+        font-size: 1.1rem;
         font-weight: 600;
-        margin-bottom: 5px;
+        margin-bottom: 6px;
     }
 
     .major-text {
         color: #d8891d;
+    }
+
+    .moderate-text {
+        color: #c9851d;
     }
 
     .minor-text {
@@ -106,44 +110,6 @@
         white-space: nowrap;
     }
 
-    .stations {
-        margin-top: 10px;
-    }
-
-    .station-badge {
-        display: inline-block;
-        background: #eff4fb;
-        color: #5f718c;
-        padding: 5px 10px;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        margin-right: 6px;
-        margin-top: 6px;
-    }
-
-    .bottom-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 25px;
-        flex-wrap: wrap;
-        gap: 15px;
-    }
-
-    .manage-btn {
-        background: #2f7fe7;
-        color: white;
-        border: none;
-        border-radius: 10px;
-        padding: 10px 18px;
-        font-weight: 600;
-    }
-
-    .manage-btn:hover {
-        background: #216ed1;
-        color: white;
-    }
-
     .empty-box {
         background: rgba(255,255,255,0.95);
         border-radius: 14px;
@@ -162,67 +128,35 @@
         margin-left: 8px;
     }
 
+    .home-btn {
+        background: #e9ecef;
+        color: #385070;
+        border-radius: 12px;
+        padding: 10px 18px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: 0.2s;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    }
+
+    .home-btn:hover {
+        background: #dfe3e7;
+        color: #1a2f5a;
+        transform: translateY(-1px);
+    }
+
     @@media (max-width: 768px) {
         .alert-top {
             flex-direction: column;
         }
     }
-
-    .clear-btn {
-    background: #ff6b6b;
-    color: white;
-    border: none;
-    border-radius: 12px;
-    padding: 10px 18px;
-    font-weight: 600;
-    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
-    transition: 0.2s;
-}
-
-.clear-btn:hover {
-    background: #e85a5a;
-    transform: translateY(-1px);
-}
-
-.home-btn {
-    background: #e9ecef;
-    color: #385070;
-    border-radius: 12px;
-    padding: 10px 18px;
-    font-weight: 500;
-    text-decoration: none;
-    transition: 0.2s;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
-}
-
-.home-btn:hover {
-    background: #dfe3e7;
-    color: #1a2f5a;
-    transform: translateY(-1px);
-}
-
 </style>
 
 @functions {
-    public string GetEmoji(string severity)
-    {
-        if (severity == "Major") return "⚠️";
-        if (severity == "Moderate") return "⚠️";
-        if (severity == "Minor") return "⚠️";
-        return "ℹ️";
-    }
-
-    public string GetLevelText(string severity)
-    {
-        if (severity == "Major") return "Major Delays";
-        if (severity == "Moderate") return "Major Delays";
-        if (severity == "Minor") return "Minor Delays";
-        return "Service Update";
-    }
-
     public string GetLevelClass(string severity)
     {
-        if (severity == "Major" || severity == "Moderate") return "major-text";
+        if (severity == "Major") return "major-text";
+        if (severity == "Moderate") return "moderate-text";
         if (severity == "Minor") return "minor-text";
         return "info-text";
     }
@@ -241,39 +175,20 @@
 
         return "Elizabeth Line";
     }
-
-    public string GetTimeText(DateTime reportedAt)
-    {
-        var diff = DateTime.Now - reportedAt;
-
-        if (diff.TotalMinutes < 1)
-        {
-            return "Just now";
-        }
-
-        if (diff.TotalMinutes < 60)
-        {
-            return ((int)diff.TotalMinutes) + "m ago";
-        }
-
-        return ((int)diff.TotalHours) + "h ago";
-    }
 }
 
 <div class="container">
     <div class="alerts-wrapper">
-        <h2 class="text-center alerts-title mb-2">Delay Alerts</h2>
-        <p class="text-center text-muted mb-4">Get notified about disruptions and delays on your route.</p>
 
-        @if (!string.IsNullOrWhiteSpace(Model.ApiStatus))
-        {
-            <p class="text-center text-muted mb-4">@Model.ApiStatus</p>
-        }
+        <h2 class="text-center alerts-title mb-2">Delay Alerts</h2>
+        <p class="text-center text-muted mb-4">Live disruptions on the Elizabeth Line</p>
 
         <div id="service-status" class="status-box">
             <strong>Elizabeth Line:</strong>
             @(Model.HasActiveDelays ? " 🚨 Disruptions Reported" : " ✅ Good Service")
-            <span class="float-end text-muted small">Updated: @Model.LastUpdated.ToString("HH:mm:ss")</span>
+            <span class="float-end text-muted small">
+                Updated: @Model.LastUpdated.ToString("HH:mm:ss")
+            </span>
         </div>
 
         <h4 class="mb-3">
@@ -286,35 +201,19 @@
             {
                 @foreach (var alert in Model.ActiveAlerts)
                 {
-                    var emoji = GetEmoji(alert.Severity);
-                    var levelText = GetLevelText(alert.Severity);
-                    var levelClass = GetLevelClass(alert.Severity);
-                    var route = GetRoute(alert.AffectedStations);
-                    var timeText = GetTimeText(alert.ReportedAt);
-
                     <div class="alert-card">
                         <div class="alert-top">
                             <div class="alert-left">
-                                <div class="alert-emoji">@emoji</div>
+                                <div class="alert-emoji">⚠️</div>
 
                                 <div>
-                                    <div class="alert-route">@route</div>
-                                    <div class="alert-level @levelClass">@levelText</div>
+                                    <div class="alert-route">@GetRoute(alert.AffectedStations)</div>
+                                    <div class="alert-level @GetLevelClass(alert.Severity)">@alert.Severity</div>
                                     <p class="alert-description">@alert.Description</p>
-
-                                    @if (alert.AffectedStations != null && alert.AffectedStations.Any())
-                                    {
-                                        <div class="stations">
-                                            @foreach (var station in alert.AffectedStations)
-                                            {
-                                                <span class="station-badge">🚆 @station</span>
-                                            }
-                                        </div>
-                                    }
                                 </div>
                             </div>
 
-                            <div class="alert-time">@timeText</div>
+                            <div class="alert-time">@alert.TimeFormatted</div>
                         </div>
                     </div>
                 }
@@ -324,181 +223,136 @@
                 <div class="empty-box">
                     <div style="font-size: 2rem;">✅</div>
                     <h5 class="mt-3">No active disruptions</h5>
-                    <p class="mb-0">All Elizabeth Line services are running smoothly.</p>
+                    <p class="mb-0">All services running smoothly.</p>
                 </div>
             }
         </div>
 
-        <div class="bottom-row">
-            <div>
-                <input type="checkbox" id="emailNotifications" @(Model.EmailNotificationsEnabled ? "checked" : "") />
-                <label for="emailNotifications">Send me email notifications</label>
-            </div>
+        <h5 class="mt-4 mb-3">Latest Updates</h5>
 
-            <button type="button" class="manage-btn">Manage Alerts</button>
+        <div id="news-feed">
+            @if (Model.ActiveAlerts != null && Model.ActiveAlerts.Any())
+            {
+                @foreach (var alert in Model.ActiveAlerts.Take(3))
+                {
+                    <div class="alert-card">
+                        <b>⚠️ @alert.Severity</b>
+                        <p class="mb-0">@alert.Description</p>
+                        <small class="text-muted">@alert.TimeFormatted</small>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="alert-card">
+                    <b>✅ Good Service</b>
+                    <p class="mb-0">No current disruptions reported.</p>
+                </div>
+            }
         </div>
 
-<div class="text-center mt-4 d-flex justify-content-center gap-3 flex-wrap">
-
-    <form method="post" asp-page-handler="ClearAlerts" id="clearForm">
-        <button type="button" class="clear-btn" onclick="openClearModal()">
-            🗑 Clear Alerts
-        </button>
-    </form>
-
-    <a href="/" class="home-btn">
-        ⬅ Back to Home
-    </a>
-
-</div>
-
-<div id="clearModal" class="modal-overlay" style="display:none;">
-    <div class="modal-box">
-        <h4>Clear all alerts?</h4>
-        <p>This will remove all current alerts from the page.</p>
-
-        <div class="modal-actions">
-            <button class="modal-cancel" onclick="closeClearModal()">Cancel</button>
-            <button class="modal-confirm" onclick="submitClear()">Yes, clear</button>
+        <div class="text-center mt-4">
+            <a href="/" class="home-btn">🏠︎ Back to Home</a>
         </div>
+
     </div>
 </div>
 
 @section Scripts {
 <script>
-    function getEmoji(severity) {
-        if (severity === "Major") return "⚠️";
-        if (severity === "Moderate") return "⚠️";
-        if (severity === "Minor") return "⚠️";
-        return "ℹ️";
+function getLevelClass(severity) {
+    if (severity === "Major") return "major-text";
+    if (severity === "Moderate") return "moderate-text";
+    if (severity === "Minor") return "minor-text";
+    return "info-text";
+}
+
+function getRoute(stations) {
+    if (stations && stations.length >= 2) {
+        return stations[0] + " ✦ " + stations[stations.length - 1];
     }
 
-    function getLevelText(severity) {
-        if (severity === "Major") return "Major Delays";
-        if (severity === "Moderate") return "Major Delays";
-        if (severity === "Minor") return "Minor Delays";
-        return "Service Update";
+    if (stations && stations.length === 1) {
+        return stations[0];
     }
 
-    function getLevelClass(severity) {
-        if (severity === "Major" || severity === "Moderate") return "major-text";
-        if (severity === "Minor") return "minor-text";
-        return "info-text";
-    }
+    return "Elizabeth Line";
+}
 
-    function getRoute(stations) {
-        if (stations && stations.length >= 2) {
-            return stations[0] + " ✦ " + stations[stations.length - 1];
+async function refreshAlerts() {
+    try {
+        const res = await fetch('/Alerts?handler=GetActiveAlerts');
+        const data = await res.json();
+
+        if (!data.success) return;
+
+        const count = document.getElementById("alert-count");
+        if (count) {
+            count.innerText = data.alertCount;
         }
 
-        if (stations && stations.length === 1) {
-            return stations[0];
-        }
-
-        return "Elizabeth Line";
-    }
-
-    function getTimeText(timeFormatted) {
-        return timeFormatted || "Just now";
-    }
-
-    function createAlertCard(alert) {
-        const stations = (alert.affectedStations || [])
-            .map(station => `<span class="station-badge">🚆 ${station}</span>`)
-            .join("");
-
-        return `
-            <div class="alert-card">
-                <div class="alert-top">
-                    <div class="alert-left">
-                        <div class="alert-emoji">${getEmoji(alert.severity)}</div>
-                        <div>
-                            <div class="alert-route">${getRoute(alert.affectedStations || [])}</div>
-                            <div class="alert-level ${getLevelClass(alert.severity)}">${getLevelText(alert.severity)}</div>
-                            <p class="alert-description">${alert.description || ""}</p>
-                            ${stations ? `<div class="stations">${stations}</div>` : ""}
-                        </div>
-                    </div>
-                    <div class="alert-time">${getTimeText(alert.timeFormatted)}</div>
-                </div>
-            </div>
-        `;
-    }
-
-    async function refreshAlerts() {
-        try {
-            const response = await fetch('/Alerts?handler=GetActiveAlerts');
-            const data = await response.json();
-
-            if (!data.success) {
-                return;
-            }
-
-            document.getElementById('alert-count').innerText = data.alertCount;
-
-            const statusBox = document.getElementById('service-status');
+        const statusBox = document.getElementById("service-status");
+        if (statusBox) {
             statusBox.innerHTML = `
                 <strong>Elizabeth Line:</strong>
                 ${data.hasActiveDelays ? " 🚨 Disruptions Reported" : " ✅ Good Service"}
                 <span class="float-end text-muted small">Updated: ${data.lastUpdated}</span>
             `;
+        }
 
-            const alertsContainer = document.getElementById('alerts-container');
+        const container = document.getElementById("alerts-container");
+        const newsFeed = document.getElementById("news-feed");
 
-            if (!data.alerts || data.alerts.length === 0) {
-                alertsContainer.innerHTML = `
-                    <div class="empty-box">
-                        <div style="font-size: 2rem;">✅</div>
-                        <h5 class="mt-3">No active disruptions</h5>
-                        <p class="mb-0">All Elizabeth Line services are running smoothly.</p>
+        if (!container || !newsFeed) return;
+
+        if (!data.alerts || data.alerts.length === 0) {
+            container.innerHTML = `
+                <div class="empty-box">
+                    <div style="font-size: 2rem;">✅</div>
+                    <h5 class="mt-3">No active disruptions</h5>
+                    <p class="mb-0">All services running smoothly.</p>
+                </div>
+            `;
+
+            newsFeed.innerHTML = `
+                <div class="alert-card">
+                    <b>✅ Good Service</b>
+                    <p class="mb-0">No current disruptions reported.</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = data.alerts.map(a => `
+            <div class="alert-card">
+                <div class="alert-top">
+                    <div class="alert-left">
+                        <div class="alert-emoji">⚠️</div>
+                        <div>
+                            <div class="alert-route">${getRoute(a.affectedStations || [])}</div>
+                            <div class="alert-level ${getLevelClass(a.severity)}">${a.severity}</div>
+                            <p class="alert-description">${a.description}</p>
+                        </div>
                     </div>
-                `;
-                return;
-            }
+                    <div class="alert-time">${a.timeFormatted}</div>
+                </div>
+            </div>
+        `).join("");
 
-            let html = "";
-            data.alerts.forEach(alert => {
-                html += createAlertCard(alert);
-            });
-
-            alertsContainer.innerHTML = html;
-        } catch (error) {
-            console.log("Could not refresh alerts");
-        }
+        newsFeed.innerHTML = data.alerts.slice(0, 3).map(a => `
+            <div class="alert-card">
+                <b>⚠️ ${a.severity}</b>
+                <p class="mb-0">${a.description}</p>
+                <small class="text-muted">${a.timeFormatted}</small>
+            </div>
+        `).join("");
     }
-
-    document.getElementById("emailNotifications")?.addEventListener("change", async function () {
-        try {
-            await fetch('/Alerts?handler=ToggleEmail', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
-                },
-                body: JSON.stringify({
-                    enabled: this.checked
-                })
-            });
-        } catch (error) {
-            console.log("Could not save email preference");
-        }
-    });
-
-    setInterval(refreshAlerts, 15000);
-    refreshAlerts();
-
-    
-    function openClearModal() {
-    document.getElementById("clearModal").style.display = "flex";
+    catch {
+        console.log("alerts failed");
+    }
 }
 
-function closeClearModal() {
-    document.getElementById("clearModal").style.display = "none";
-}
-
-function submitClear() {
-    document.getElementById("clearForm").submit();
-}
-
+refreshAlerts();
+setInterval(refreshAlerts, 15000);
 </script>
 }

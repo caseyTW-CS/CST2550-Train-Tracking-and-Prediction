@@ -125,3 +125,29 @@ body {
     .modal-confirm:hover {
         background: #d63c2d;
     }
+
+@keyframes bellShake {
+    0% {
+        transform: rotate(0);
+    }
+
+    25% {
+        transform: rotate(-15deg);
+    }
+
+    50% {
+        transform: rotate(15deg);
+    }
+
+    75% {
+        transform: rotate(-10deg);
+    }
+
+    100% {
+        transform: rotate(0);
+    }
+}
+
+.bell-animate {
+    animation: bellShake 0.6s ease;
+}

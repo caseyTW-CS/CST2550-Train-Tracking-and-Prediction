@@ -1,61 +1,125 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace TrainApp.Models
 {
     public class AlertService
     {
-        public List<string> activeAlerts { get; private set; }
+        private readonly HttpClient _http;
 
         public AlertService()
         {
-            activeAlerts = new List<string>();
+            _http = new HttpClient();
         }
 
-        public string trainApproachingAlert(TrainPosition trainPosition)
+        // get alerts from TfL and process them
+        public async Task<List<AlertResult>> GetAlertsAsync()
         {
-            double minutesLeft = trainPosition.minutesUntilNextStation();
+            var alerts = new List<AlertResult>();
 
-            if (minutesLeft <= 2)
+            try
             {
-                string alert = $"[APPROACHING] Train approaching {trainPosition.nextStation.stationName} " +
-                               $"- arriving in {minutesLeft:F0} minute(s)";
-                activeAlerts.Add(alert);
-                return alert;
+                string url = "https://api.tfl.gov.uk/Line/elizabeth";
+                var response = await _http.GetAsync(url);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return alerts;
+                }
+
+                var json = await response.Content.ReadAsStringAsync();
+
+                var lines = JsonSerializer.Deserialize<List<TfLLine>>(json,
+                    new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+
+                var elizabeth = lines?.FirstOrDefault();
+
+                if (elizabeth?.LineStatuses != null)
+                {
+                    foreach (var status in elizabeth.LineStatuses)
+                    {
+                        string severity = status.StatusSeverityDescription ?? "Unknown";
+                        string description = status.Reason ?? severity;
+
+                        // skip if no useful info
+                        if (string.IsNullOrWhiteSpace(description))
+                            continue;
+
+                        alerts.Add(new AlertResult
+                        {
+                            Description = description,
+                            Severity = MapSeverity(severity),
+                            ReportedAt = DateTime.Now
+                        });
+                    }
+                }
+
+                // if no alerts, add "good service" message
+                if (!alerts.Any())
+                {
+                    alerts.Add(new AlertResult
+                    {
+                        Description = "All trains running normally on the Elizabeth Line",
+                        Severity = "Info",
+                        ReportedAt = DateTime.Now
+                    });
+                }
             }
-            return null;
+            catch
+            {
+                alerts.Add(new AlertResult
+                {
+                    Description = "Unable to fetch live service data",
+                    Severity = "Info",
+                    ReportedAt = DateTime.Now
+                });
+            }
+
+            return alerts;
         }
 
-        public string delayAlert(Journey journey)
+        // convert TfL text into simple severity
+        private string MapSeverity(string text)
         {
-            if (journey.currentDelayMinutes > 0)
-            {
-                string severity = Disruption.calculateSeverity(journey.currentDelayMinutes);
-                string alert = $"[{severity} DELAY] {journey.journeyTrain.trainNumber} " +
-                               $"from {journey.departureStation.stationName} to {journey.arrivalStation.stationName} " +
-                               $"is delayed by {journey.currentDelayMinutes} minute(s). " +
-                               $"New arrival time: {journey.getPredictedArrival():HH:mm}";
-                activeAlerts.Add(alert);
-                return alert;
-            }
-            return null;
-        }
+            text = text.ToLower();
 
-        public void clearAlerts()
-        {
-            activeAlerts.Clear();
-        }
+            if (text.Contains("good"))
+                return "Info";
 
-        public void displayAllAlerts()
-        {
-            if (activeAlerts.Count == 0)
-            {
-                return;
-            }
-            foreach (string alert in activeAlerts)
-            {
-                //Console.WriteLine(alert);
-            }
+            if (text.Contains("minor"))
+                return "Minor";
+
+            if (text.Contains("severe") || text.Contains("suspended"))
+                return "Major";
+
+            return "Moderate";
         }
+    }
+
+    // TfL models
+    public class TfLLine
+    {
+        public List<LineStatus>? LineStatuses { get; set; }
+    }
+
+    public class LineStatus
+    {
+        public string? StatusSeverityDescription { get; set; }
+        public string? Reason { get; set; }
+    }
+
+    // clean alert format for UI
+    public class AlertResult
+    {
+        public string Description { get; set; } = "";
+        public string Severity { get; set; } = "";
+        public DateTime ReportedAt { get; set; }
     }
 }

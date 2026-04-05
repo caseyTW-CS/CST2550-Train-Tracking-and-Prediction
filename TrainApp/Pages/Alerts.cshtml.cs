@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+using TrainApp.Models;
 
 namespace TrainApp.Pages
 {
@@ -35,56 +36,32 @@ namespace TrainApp.Pages
         {
             try
             {
-                string url = "https://api.tfl.gov.uk/Line/elizabeth";
-                var response = await _httpClient.GetAsync(url);
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    ApiStatus = "TfL API unavailable";
-                    return;
-                }
-
-                var json = await response.Content.ReadAsStringAsync();
-
-                var lines = JsonSerializer.Deserialize<List<TfLLine>>(json,
-                    new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true
-                    });
-
                 ActiveAlerts.Clear();
 
-                var elizabeth = lines?.FirstOrDefault();
+                var service = new AlertService();
+                var backendAlerts = await service.GetAlertsAsync();
 
-                if (elizabeth?.LineStatuses != null)
+                foreach (var item in backendAlerts)
                 {
-                    foreach (var status in elizabeth.LineStatuses)
+                    ActiveAlerts.Add(new AlertDisplay
                     {
-                        // only add if there's actually a reason (delay info)
-                        if (!string.IsNullOrWhiteSpace(status.Reason))
-                        {
-                            var alert = new AlertDisplay
-                            {
-                                Id = Guid.NewGuid().ToString(),
-                                Description = status.Reason,
-                                ReportedAt = DateTime.Now,
-                                AffectedStations = ExtractStations(status.Reason)
-                            };
-
-                            ApplySeverity(alert);
-                            ActiveAlerts.Add(alert);
-                        }
-                    }
+                        Id = Guid.NewGuid().ToString(),
+                        Description = item.Description,
+                        Severity = item.Severity,
+                        ReportedAt = item.ReportedAt,
+                        AffectedStations = ExtractStations(item.Description)
+                    });
                 }
 
-                HasActiveDelays = ActiveAlerts.Any();
+                HasActiveDelays = ActiveAlerts.Any(a => a.Severity != "Info");
+
                 ApiStatus = HasActiveDelays
-                    ? $"Live disruptions: {ActiveAlerts.Count}"
+                    ? $"Live alerts: {ActiveAlerts.Count}"
                     : "Good Service";
             }
             catch
             {
-                ApiStatus = "Error fetching live data";
+                ApiStatus = "Error fetching data";
             }
 
             LastUpdated = DateTime.Now;

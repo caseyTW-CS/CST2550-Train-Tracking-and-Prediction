@@ -45,23 +45,31 @@ namespace TrainApp.Models
                 {
                     foreach (var status in elizabeth.LineStatuses)
                     {
-                        string severity = status.StatusSeverityDescription ?? "Unknown";
-                        string description = status.Reason ?? severity;
+                        // ?? use reason if available, otherwise fallback
+                        string description = status.Reason;
 
-                        // skip if no useful info
+                        if (string.IsNullOrWhiteSpace(description))
+                            description = status.StatusSeverityDescription;
+
                         if (string.IsNullOrWhiteSpace(description))
                             continue;
 
-                        alerts.Add(new AlertResult
+                        // skip good service
+                        if (description.Contains("Good Service", StringComparison.OrdinalIgnoreCase))
+                            continue;
+
+                        var alert = new AlertResult
                         {
                             Description = description,
-                            Severity = MapSeverity(severity),
+                            Severity = MapSeverity(description),
                             ReportedAt = DateTime.Now
-                        });
+                        };
+
+                        alerts.Add(alert);
                     }
                 }
 
-                // if no alerts, add "good service" message
+                // if no alerts found ? show good service
                 if (!alerts.Any())
                 {
                     alerts.Add(new AlertResult
@@ -85,7 +93,7 @@ namespace TrainApp.Models
             return alerts;
         }
 
-        // convert TfL text into simple severity
+        // convert TfL text into severity
         private string MapSeverity(string text)
         {
             text = text.ToLower();

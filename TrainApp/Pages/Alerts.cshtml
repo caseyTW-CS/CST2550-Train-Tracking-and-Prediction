@@ -76,6 +76,24 @@
     }
 </style>
 
+@functions {
+    public string GetRoute(List<string> stations)
+    {
+        if (stations != null && stations.Count >= 2)
+        {
+            return stations.First() + " ✦ " + stations.Last();
+        }
+
+        if (stations != null && stations.Count == 1)
+        {
+            return stations[0];
+        }
+
+        return "Elizabeth Line";
+    }
+}
+
+
 <div class="container">
     <div class="alerts-wrapper">
 
@@ -128,6 +146,17 @@ background:rgba(0,0,0,0.4); justify-content:center; align-items:center;">
 let alertsPaused = false;
 let backup = "";
 
+//same route in JS
+function getRoute(stations) {
+    if (stations && stations.length >= 2) {
+        return stations[0] + " ✦ " + stations[stations.length - 1];
+    }
+    if (stations && stations.length === 1) {
+        return stations[0];
+    }
+    return "Elizabeth Line";
+}
+
 // modal controls
 function openClearConfirm() {
     document.getElementById("clearConfirmBox").style.display = "flex";
@@ -178,7 +207,7 @@ function undoClear() {
     alertsPaused = false;
 }
 
-// refresh alerts
+//refresh alerts
 async function refreshAlerts() {
     if (alertsPaused) return;
 
@@ -197,18 +226,20 @@ async function refreshAlerts() {
             return;
         }
 
-        container.innerHTML = data.alerts.map(a => `
-            <div class="alert-card">
-                ⚠️ ${a.severity} <br>
-                ${a.description}
-            </div>
-        `).join("");
+       container.innerHTML = data.alerts.map(a => `
+    <div class="alert-card">
+        <b>⚠️ ${a.severity}</b><br>
+        ${a.description}<br>
+        <small class="text-muted">
+            ${new Date(a.reportedAt).toLocaleTimeString()}
+        </small>
+    </div>
+`).join("");
 
     } catch {
         console.log("error");
     }
 }
-
 // run
 refreshAlerts();
 setInterval(refreshAlerts, 15000);

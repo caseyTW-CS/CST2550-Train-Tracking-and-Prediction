@@ -25,7 +25,7 @@ namespace TrainApp.Pages
         public async Task OnGetAsync()
         {
             ActiveAlerts = await _alertService.GetAlertsAsync();
-            HasActiveDelays = ActiveAlerts.Count > 0;
+            HasActiveDelays = ActiveAlerts.Any(a => a.Severity != "Info");
             LastUpdated = DateTime.Now;
         }
 

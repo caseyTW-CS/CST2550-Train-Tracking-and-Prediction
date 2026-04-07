@@ -146,6 +146,11 @@ background:rgba(0,0,0,0.4); justify-content:center; align-items:center;">
 let alertsPaused = false;
 let backup = "";
 
+// ✅ restore cleared state on load
+if (sessionStorage.getItem("alertsCleared") === "true") {
+    alertsPaused = true;
+}
+
 //same route in JS
 function getRoute(stations) {
     if (stations && stations.length >= 2) {
@@ -165,25 +170,20 @@ function closeClearConfirm() {
     document.getElementById("clearConfirmBox").style.display = "none";
 }
 
-// clear alerts
+// 🔥 CLEAR ALERTS (instant + persistent)
 function confirmClear() {
     closeClearConfirm();
 
     const container = document.getElementById("alerts-container");
     backup = container.innerHTML;
 
-    container.style.opacity = "0";
-
-    setTimeout(() => {
-        container.innerHTML = `
-            <div class="empty-box">
-                🧹 Alerts cleared
-                <br><br>
-                <button onclick="undoClear()">Undo</button>
-            </div>
-        `;
-        container.style.opacity = "1";
-    }, 300);
+    container.innerHTML = `
+        <div class="empty-box">
+            🧹 Alerts cleared
+            <br><br>
+            <button onclick="undoClear()">Undo</button>
+        </div>
+    `;
 
     document.getElementById("alert-count").innerText = "0";
 
@@ -191,25 +191,39 @@ function confirmClear() {
     if (badge) badge.style.display = "none";
 
     alertsPaused = true;
+
+    // ✅ persist cleared state
+    sessionStorage.setItem("alertsCleared", "true");
 }
 
-// undo
+// 🔥 UNDO CLEAR (instant restore)
 function undoClear() {
     const container = document.getElementById("alerts-container");
 
-    container.style.opacity = "0";
-
-    setTimeout(() => {
-        container.innerHTML = backup;
-        container.style.opacity = "1";
-    }, 200);
+    container.innerHTML = backup;
 
     alertsPaused = false;
+
+    // ✅ remove saved state
+    sessionStorage.removeItem("alertsCleared");
 }
 
-//refresh alerts
+// 🔄 REFRESH ALERTS
 async function refreshAlerts() {
-    if (alertsPaused) return;
+
+    const container = document.getElementById("alerts-container");
+
+    // ✅ if cleared, DO NOT fetch
+    if (alertsPaused) {
+        container.innerHTML = `
+            <div class="empty-box">
+                🧹 Alerts cleared
+                <br><br>
+                <button onclick="undoClear()">Undo</button>
+            </div>
+        `;
+        return;
+    }
 
     try {
         const res = await fetch('/Alerts?handler=GetActiveAlerts');
@@ -219,28 +233,32 @@ async function refreshAlerts() {
 
         document.getElementById("alert-count").innerText = data.alertCount;
 
-        const container = document.getElementById("alerts-container");
-
-        if (!data.alerts.length) {
+        if (!data.alerts || !data.alerts.length) {
             container.innerHTML = `<div class="empty-box">No disruptions</div>`;
             return;
         }
 
-       container.innerHTML = data.alerts.map(a => `
-    <div class="alert-card">
-        <b>⚠️ ${a.severity}</b><br>
-        ${a.description}<br>
-        <small class="text-muted">
-            ${new Date(a.reportedAt).toLocaleTimeString()}
-        </small>
-    </div>
-`).join("");
+        container.innerHTML = data.alerts.map(a => `
+            <div class="alert-card">
+                <b>⚠️ ${a.severity}</b><br>
+                ${a.description}<br>
+
+                ${a.stations && a.stations.length 
+                    ? `<small>📍 Stations: ${a.stations.join(" ✦ ")}</small><br>` 
+                    : ""}
+
+                <small class="text-muted">
+                    ${new Date(a.reportedAt).toLocaleTimeString()}
+                </small>
+            </div>
+        `).join("");
 
     } catch {
         console.log("error");
     }
 }
-// run
+
+// 🚀 run
 refreshAlerts();
 setInterval(refreshAlerts, 15000);
 </script>

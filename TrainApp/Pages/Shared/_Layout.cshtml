@@ -51,7 +51,7 @@
                     <!-- 👤 USER / LOGIN -->
                     @if (Context.Session.GetString("UserName") != null)
                     {
-                        <span class="text-dark">
+                        <span class="text-white">
                             Hello @Context.Session.GetString("UserName")
                         </span>
 
@@ -146,23 +146,30 @@ fetch("https://api.tfl.gov.uk/Line/elizabeth/Status")
 let lastAlertCount = 0;
 
 async function refreshAlertsGlobal() {
+
+    const badge = document.getElementById("alertBadge");
+    const bell = document.getElementById("alertBell");
+
+    // If alerts were cleared → hide badge and STOP
+    if (sessionStorage.getItem("alertsCleared") === "true") {
+        if (badge) badge.style.display = "none";
+        return;
+    }
+
     try {
         const res = await fetch('/Alerts?handler=GetActiveAlerts');
         const data = await res.json();
 
         if (!data.success) return;
 
-        const badge = document.getElementById("alertBadge");
-        const bell = document.getElementById("alertBell");
-
         if (badge) {
             // update number
             badge.innerText = data.alertCount;
 
-            // hide if 0
+            // show/hide badge
             badge.style.display = data.alertCount > 0 ? "inline-block" : "none";
 
-            // 🔔 animate if new alerts appear
+            // 🔔 animate bell if new alerts appear
             if (data.alertCount > lastAlertCount && bell) {
                 bell.classList.add("bell-animate");
 
@@ -179,7 +186,7 @@ async function refreshAlertsGlobal() {
     }
 }
 
-// run immediately + every 15s
+// 🚀 run immediately + every 15s
 refreshAlertsGlobal();
 setInterval(refreshAlertsGlobal, 15000);
 </script>

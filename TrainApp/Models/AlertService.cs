@@ -16,20 +16,18 @@ namespace TrainApp.Models
             _http = new HttpClient();
         }
 
-        // get alerts from TfL and process them
         public async Task<List<AlertResult>> GetAlertsAsync()
         {
             var alerts = new List<AlertResult>();
 
             try
             {
-                string url = "https://api.tfl.gov.uk/Line/elizabeth";
+                // SAME endpoint as rest of our app
+                string url = "https://api.tfl.gov.uk/Line/elizabeth/Status";
                 var response = await _http.GetAsync(url);
 
                 if (!response.IsSuccessStatusCode)
-                {
                     return alerts;
-                }
 
                 var json = await response.Content.ReadAsStringAsync();
 
@@ -45,7 +43,6 @@ namespace TrainApp.Models
                 {
                     foreach (var status in elizabeth.LineStatuses)
                     {
-                        // ?? use reason if available, otherwise fallback
                         string description = status.Reason;
 
                         if (string.IsNullOrWhiteSpace(description))
@@ -54,30 +51,18 @@ namespace TrainApp.Models
                         if (string.IsNullOrWhiteSpace(description))
                             continue;
 
-                        // skip good service
+                        // ❌ Skip "Good Service"
                         if (description.Contains("Good Service", StringComparison.OrdinalIgnoreCase))
                             continue;
 
-                        var alert = new AlertResult
+                        alerts.Add(new AlertResult
                         {
                             Description = description,
                             Severity = MapSeverity(description),
-                            ReportedAt = DateTime.Now
-                        };
-
-                        alerts.Add(alert);
+                            ReportedAt = DateTime.Now,
+                            Stations = ExtractStations(description)
+                        });
                     }
-                }
-
-                // if no alerts found ? show good service
-                if (!alerts.Any())
-                {
-                    alerts.Add(new AlertResult
-                    {
-                        Description = "All trains running normally on the Elizabeth Line",
-                        Severity = "Info",
-                        ReportedAt = DateTime.Now
-                    });
                 }
             }
             catch
@@ -86,26 +71,73 @@ namespace TrainApp.Models
                 {
                     Description = "Unable to fetch live service data",
                     Severity = "Info",
-                    ReportedAt = DateTime.Now
+                    ReportedAt = DateTime.Now,
+                    Stations = new List<string>()
                 });
             }
 
             return alerts;
         }
 
-        // convert TfL text into severity
+        // 🔍 Extract stations from text
+        private List<string> ExtractStations(string text)
+        {
+            var stations = new List<string>();
+
+            if (string.IsNullOrWhiteSpace(text))
+                return stations;
+
+            text = text.Replace("\n", " ").Trim();
+
+            // between X and Y
+            if (text.Contains("between") && text.Contains(" and "))
+            {
+                try
+                {
+                    var part = text.Split("between", StringSplitOptions.RemoveEmptyEntries)[1];
+                    var split = part.Split(" and ");
+
+                    if (split.Length >= 2)
+                    {
+                        stations.Add(split[0].Trim());
+                        stations.Add(split[1].Split('.')[0].Trim());
+                    }
+                }
+                catch { }
+            }
+
+            // X → Y or X ↔ Y
+            else if (text.Contains("→") || text.Contains("↔"))
+            {
+                try
+                {
+                    var arrow = text.Contains("→") ? "→" : "↔";
+                    var split = text.Split(arrow);
+
+                    if (split.Length >= 2)
+                    {
+                        stations.Add(split[0].Trim());
+                        stations.Add(split[1].Trim());
+                    }
+                }
+                catch { }
+            }
+
+            return stations.Distinct().ToList();
+        }
+
         private string MapSeverity(string text)
         {
             text = text.ToLower();
-
-            if (text.Contains("good"))
-                return "Info";
 
             if (text.Contains("minor"))
                 return "Minor";
 
             if (text.Contains("severe") || text.Contains("suspended"))
                 return "Major";
+
+            if (text.Contains("good"))
+                return "Info";
 
             return "Moderate";
         }
@@ -123,11 +155,12 @@ namespace TrainApp.Models
         public string? Reason { get; set; }
     }
 
-    // clean alert format for UI
+    // UI model
     public class AlertResult
     {
         public string Description { get; set; } = "";
         public string Severity { get; set; } = "";
         public DateTime ReportedAt { get; set; }
+        public List<string> Stations { get; set; } = new();
     }
 }

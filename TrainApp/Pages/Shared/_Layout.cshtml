@@ -33,10 +33,20 @@
                         ● Loading...
                     </span>
 
-                    <!-- ⭐ FAVOURITES -->
-                    <a asp-page="/Account#favourites" title="Favourites" style="text-decoration:none; font-size:20px;">
-                        ⭐
-                    </a>
+                    <!-- ⭐ FAVOURITES DROPDOWN -->
+                    <div class="dropdown">
+                        <button id="favBtn" class="btn btn-link p-0 border-0" title="Favourites"
+                                style="font-size:20px; text-decoration:none; line-height:1;"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                            ⭐
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow" id="favDropdown" style="min-width:220px;">
+                            <li><h6 class="dropdown-header">⭐ Favourite Stations</h6></li>
+                            <li><div id="favList"><div class="dropdown-item text-muted" style="font-size:13px;">Loading...</div></div></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/Account#favourites" style="font-size:13px;">Manage favourites →</a></li>
+                        </ul>
+                    </div>
 
                     <!-- 👤 USER / LOGIN -->
                     @if (Context.Session.GetString("UserName") != null)
@@ -172,6 +182,34 @@ async function refreshAlertsGlobal() {
 // run immediately + every 15s
 refreshAlertsGlobal();
 setInterval(refreshAlertsGlobal, 15000);
+</script>
+
+<!-- ⭐ FAVOURITES DROPDOWN -->
+<script>
+document.getElementById('favBtn').addEventListener('show.bs.dropdown', function () {
+    fetch('/Account?handler=Favourites')
+        .then(res => res.json())
+        .then(data => {
+            const list = document.getElementById('favList');
+
+            if (!data.loggedIn) {
+                list.innerHTML = '<a class="dropdown-item text-muted" href="/Login" style="font-size:13px;">Log in to see favourites</a>';
+                return;
+            }
+
+            if (!data.stations || data.stations.length === 0) {
+                list.innerHTML = '<div class="dropdown-item text-muted" style="font-size:13px;">No favourites yet — add them on your account page.</div>';
+                return;
+            }
+
+            list.innerHTML = data.stations.map(s =>
+                `<li><a class="dropdown-item" href="/Departures?stationName=${encodeURIComponent(s)}" style="font-size:13px;">🚉 ${s}</a></li>`
+            ).join('');
+        })
+        .catch(() => {
+            document.getElementById('favList').innerHTML = '<div class="dropdown-item text-muted" style="font-size:13px;">Could not load favourites.</div>';
+        });
+});
 </script>
 
 @RenderSection("Scripts", required: false)

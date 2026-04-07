@@ -112,5 +112,34 @@ namespace TrainApp.Pages
 
             return RedirectToPage();
         }
+
+        // Returns favourite stations as JSON for the navbar dropdown
+        public IActionResult OnGetFavourites()
+        {
+            var username = HttpContext.Session.GetString("UserName");
+
+            if (username == null)
+                return new JsonResult(new { loggedIn = false });
+
+            var stations = new List<string>();
+
+            using (var conn = new SqliteConnection(connectionString))
+            {
+                conn.Open();
+
+                var cmd = new SqliteCommand(
+                    "SELECT stationName FROM favouriteStations WHERE userName = @name", conn);
+
+                cmd.Parameters.AddWithValue("@name", username);
+
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                        stations.Add(reader["stationName"].ToString());
+                }
+            }
+
+            return new JsonResult(new { loggedIn = true, stations });
+        }
     }
 }

@@ -23,8 +23,14 @@ namespace TrainApp.Pages
         [BindProperty]
         public string? stationName { get; set; }
 
-        public void OnGet()
+        public async Task OnGet(string? stationName)
         {
+            // Pre-fill and auto-search when arriving from the favourites dropdown
+            if (!string.IsNullOrWhiteSpace(stationName))
+            {
+                this.stationName = stationName;
+                await OnPostAsync();
+            }
         }
 
         public async Task OnPostAsync()

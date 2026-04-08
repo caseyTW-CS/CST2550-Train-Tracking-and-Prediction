@@ -22,7 +22,6 @@ namespace TrainApp.Models
 
             try
             {
-                // SAME endpoint as rest of our app
                 string url = "https://api.tfl.gov.uk/Line/elizabeth/Status";
                 var response = await _http.GetAsync(url);
 
@@ -32,10 +31,7 @@ namespace TrainApp.Models
                 var json = await response.Content.ReadAsStringAsync();
 
                 var lines = JsonSerializer.Deserialize<List<TfLLine>>(json,
-                    new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true
-                    });
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
                 var elizabeth = lines?.FirstOrDefault();
 
@@ -43,26 +39,43 @@ namespace TrainApp.Models
                 {
                     foreach (var status in elizabeth.LineStatuses)
                     {
-                        string description = status.Reason;
+                        // 🔥 PRIORITY: Use Reason FIRST if exists
+                        string description = !string.IsNullOrWhiteSpace(status.Reason)
+                            ? status.Reason
+                            : status.StatusSeverityDescription ?? "";
 
-                        if (string.IsNullOrWhiteSpace(description))
-                            description = status.StatusSeverityDescription;
-
+                        // ❌ Ignore empty
                         if (string.IsNullOrWhiteSpace(description))
                             continue;
 
-                        // ❌ Skip "Good Service"
-                        if (description.Contains("Good Service", StringComparison.OrdinalIgnoreCase))
+                        // ❌ Only skip TRUE clean "Good Service"
+                        if (status.StatusSeverityDescription != null &&
+                            status.StatusSeverityDescription.Equals("Good Service", StringComparison.OrdinalIgnoreCase) &&
+                            string.IsNullOrWhiteSpace(status.Reason))
+                        {
                             continue;
+                        }
 
                         alerts.Add(new AlertResult
                         {
-                            Description = description,
-                            Severity = MapSeverity(description),
+                            Description = description.Trim(),
+                            Severity = MapSeverity(status.StatusSeverityDescription, description),
                             ReportedAt = DateTime.Now,
                             Stations = ExtractStations(description)
                         });
                     }
+                }
+
+                // ✅ fallback if nothing found
+                if (!alerts.Any())
+                {
+                    alerts.Add(new AlertResult
+                    {
+                        Description = "All trains running normally on the Elizabeth Line",
+                        Severity = "Info",
+                        ReportedAt = DateTime.Now,
+                        Stations = new List<string>()
+                    });
                 }
             }
             catch
@@ -79,7 +92,7 @@ namespace TrainApp.Models
             return alerts;
         }
 
-        // 🔍 Extract stations from text
+        // 🔍 Improved station extractor
         private List<string> ExtractStations(string text)
         {
             var stations = new List<string>();
@@ -106,7 +119,7 @@ namespace TrainApp.Models
                 catch { }
             }
 
-            // X → Y or X ↔ Y
+            // arrows
             else if (text.Contains("→") || text.Contains("↔"))
             {
                 try
@@ -126,14 +139,14 @@ namespace TrainApp.Models
             return stations.Distinct().ToList();
         }
 
-        private string MapSeverity(string text)
+        private string MapSeverity(string severityText, string description)
         {
-            text = text.ToLower();
+            var text = (severityText + " " + description).ToLower();
 
             if (text.Contains("minor"))
                 return "Minor";
 
-            if (text.Contains("severe") || text.Contains("suspended"))
+            if (text.Contains("severe") || text.Contains("suspended") || text.Contains("closed"))
                 return "Major";
 
             if (text.Contains("good"))
@@ -143,7 +156,6 @@ namespace TrainApp.Models
         }
     }
 
-    // TfL models
     public class TfLLine
     {
         public List<LineStatus>? LineStatuses { get; set; }
@@ -155,7 +167,6 @@ namespace TrainApp.Models
         public string? Reason { get; set; }
     }
 
-    // UI model
     public class AlertResult
     {
         public string Description { get; set; } = "";

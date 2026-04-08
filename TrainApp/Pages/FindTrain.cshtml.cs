@@ -225,16 +225,16 @@ namespace TrainApp.Pages
 
                         if (JourneyResults.Count >= 8) break;
                     }
-
                     if (JourneyResults.Count == 0)
                         errorMessage = "No scheduled trains found for this time.";
                 }
             }
-            errorMessage = $"Error: {ex.Message}";
+            catch (Exception ex)
             {
-                errorMessage = $"Error: {ex.Message} | Start: {StartId} | Dest: {Destination}";
+                errorMessage = $"Error: {ex.Message}";
             }
         }
+
 
         private async Task LoadStations()
         {

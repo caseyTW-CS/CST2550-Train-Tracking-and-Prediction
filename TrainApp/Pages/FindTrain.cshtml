@@ -7,76 +7,147 @@
         font-size: 2.2rem;
         color: #1a2f5a;
     }
+    .journey-card {
+        border-left: 4px solid #4a7cc7;
+        border-radius: 8px;
+        padding: 12px 16px;
+        margin-bottom: 10px;
+        background: #f8fbff;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .journey-card:hover {
+        background: #eaf2ff;
+    }
+    .journey-time {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1a2f5a;
+    }
+    .journey-duration {
+        font-size: 12px;
+        color: #6b7c93;
+    }
+    .train-card {
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 12px;
+        background: white;
+        border: 1px solid #e8f0f8;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: block;
+        color: inherit;
+    }
+    .train-card:hover {
+        border-color: #4a7cc7;
+        box-shadow: 0 4px 12px rgba(74,124,199,0.15);
+        text-decoration: none;
+        color: inherit;
+    }
+    .train-dest {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1a2f5a;
+        margin-bottom: 4px;
+    }
+    .train-time {
+        font-size: 13px;
+        color: #6b7c93;
+    }
+    .train-arrow {
+        font-size: 18px;
+        color: #4a7cc7;
+    }
+    .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: #4a7cc7;
+        font-size: 14px;
+        cursor: pointer;
+        margin-bottom: 1.5rem;
+        text-decoration: none;
+        border: none;
+        background: none;
+        padding: 0;
+    }
+    .back-btn:hover { color: #2d4a7a; text-decoration: none; }
+    .route-header {
+        background: #f0f6ff;
+        border-radius: 10px;
+        padding: 12px 16px;
+        margin-bottom: 1.5rem;
+        font-size: 14px;
+        color: #2d4a7a;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
 </style>
 
 <div class="container mt-4" style="max-width:700px;">
 
-    <div class="card p-4 shadow">
+    <!-- Back Button -->
+    <a href="/" class="back-btn">← Back to Search</a>
 
-        <h2 class="mb-3 text-center train-title">Find My Train</h2>
+    <!-- Error -->
+    @if (Model.errorMessage != null)
+    {
+        <div class="alert alert-danger mt-3">@Model.errorMessage</div>
+    }
 
-        <form method="post">
+    <!-- Route Header -->
+    @if (Model.Results.Count > 0 || Model.JourneyResults.Count > 0)
+    {
+        <div class="route-header">
+            🚉 <strong>@(string.IsNullOrEmpty(Model.GetStationName(Model.StartId)) ? Model.StartId : Model.GetStationName(Model.StartId))</strong>
+            &nbsp;→&nbsp;
+            <strong>@Model.Destination</strong>
+        </div>
+    }
 
-            <!-- Start Station -->
-            <div class="mb-3">
-                <label>Start Station</label>
-                <select asp-for="StartId" class="form-control">
-                    <option value="">Select Start Station</option>
-                    @foreach (var station in Model.Stations)
-                    {
-                        <option value="@station.id">@station.commonName</option>
-                    }
-                </select>
-            </div>
-
-            <!-- Destination -->
-            <div class="mb-3">
-                <label>Destination</label>
-                <input asp-for="Destination" class="form-control" placeholder="e.g. Abbey Wood" />
-            </div>
-
-            <button type="submit" class="btn btn-primary w-100">Search</button>
-
-        </form>
-
-        <!-- Error -->
-        @if (Model.errorMessage != null)
+    <!-- Scheduled Journey Results -->
+    @if (Model.IsScheduled && Model.JourneyResults.Count > 0)
+    {
+        <h5 class="mb-3" style="color:#2d4a7a;">Scheduled Journeys</h5>
+        @foreach (var journey in Model.JourneyResults)
         {
-            <div class="alert alert-danger mt-3">
-                @Model.errorMessage
+            <div class="journey-card">
+                <div class="journey-time">🚆 @journey.DepartureTime → @journey.ArrivalTime</div>
+                <div class="journey-duration">Duration: @journey.Duration mins · To: @journey.Destination</div>
             </div>
         }
+    }
 
-        <!-- Results -->
-        @if (Model.Results.Count > 0)
+ <!-- Live Results -->
+    @if (!Model.IsScheduled && Model.Results.Count > 0)
+    {
+        <h5 class="mb-3" style="color:#2d4a7a;">Available Trains</h5>
+        @foreach (var train in Model.Results)
         {
-            <h4 class="mt-4">Available Trains</h4>
-
-            @foreach (var train in Model.Results)
-            {
-                <div class="card p-3 mb-2">
-
-                    <b>@train.destinationName</b><br />
-
-                    <span>
-                        @(train.timeToStation <= 0 
-                            ? "At station now" 
-                            : "Arrives at " + Model.GetArrivalTime(train.timeToStation))
-                    </span>
-
-                    <!-- ✅ FIXED BUTTON -->
-                    <a asp-page="/TrainDetails"
-                       asp-route-start="@Model.GetStationName(Model.StartId)"
-                       asp-route-dest="@train.destinationName"
-                       asp-route-time="@train.timeToStation"
-                       class="btn btn-sm btn-outline-primary mt-2">
-                        View Details
-                    </a>
-
+            <a asp-page="/TrainDetails"
+               asp-route-start="@(string.IsNullOrEmpty(Model.GetStationName(Model.StartId)) ? Model.StartId : Model.GetStationName(Model.StartId))"
+               asp-route-dest="@train.destinationName"
+               asp-route-time="@train.timeToStation"
+               asp-route-location="@train.currentLocation"
+               asp-route-towards="@train.towards"
+               asp-route-vehicleId="@train.vehicleId"
+               class="train-card">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <div class="train-dest">🚆 @train.destinationName</div>
+                        <div class="train-time">
+                            @(train.timeToStation <= 0
+                                ? "At station now"
+                                : "Arrives at " + Model.GetArrivalTime(train.timeToStation))
+                        </div>
+                    </div>
+                    <span class="train-arrow">›</span>
                 </div>
-            }
+            </a>
         }
-
-    </div>
+    }
 
 </div>

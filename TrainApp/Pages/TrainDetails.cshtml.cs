@@ -9,14 +9,14 @@ namespace TrainApp.Pages
     {
         public string Start { get; set; } = "";
         public string Destination { get; set; } = "";
-
         public int TimeToStation { get; set; }
-
         public string ArrivalTime { get; set; } = "";
         public string DepartureTime { get; set; } = "";
-
         public int DurationMinutes { get; set; }
-
+        public string CurrentLocation { get; set; } = "";
+        public string Towards { get; set; } = "";
+        public string VehicleId { get; set; } = "";
+        public string TrainName { get; set; } = "";
         public List<string> Route = new List<string>();
 
         private List<string> stationOrder = new List<string>
@@ -30,9 +30,8 @@ namespace TrainApp.Pages
             "Brentwood","Shenfield","Canary Wharf","Custom House","Woolwich","Abbey Wood"
         };
 
-        public void OnGet(string start, string dest, int time)
+        public void OnGet(string start, string dest, int time, string location, string towards, string vehicleId)
         {
-            // ✅ SAFETY CHECK (prevents crash)
             if (string.IsNullOrEmpty(start) || string.IsNullOrEmpty(dest))
             {
                 Start = "Unknown";
@@ -43,6 +42,9 @@ namespace TrainApp.Pages
             Start = start;
             Destination = dest;
             TimeToStation = time;
+            CurrentLocation = !string.IsNullOrEmpty(location) ? location : "Not available";
+            Towards = !string.IsNullOrEmpty(towards) ? towards : dest;
+            VehicleId = vehicleId ?? "";
 
             DepartureTime = DateTime.Now.ToString("HH:mm");
 
@@ -50,12 +52,14 @@ namespace TrainApp.Pages
             {
                 ArrivalTime = "Now";
                 DurationMinutes = 0;
+                TrainName = $"Elizabeth Line · Now to {dest}";
             }
             else
             {
                 DateTime arrival = DateTime.Now.AddSeconds(time);
                 ArrivalTime = arrival.ToString("HH:mm");
                 DurationMinutes = time / 60;
+                TrainName = $"Elizabeth Line · {DepartureTime} to {dest}";
             }
 
             BuildRoute();
@@ -72,16 +76,12 @@ namespace TrainApp.Pages
             if (startIndex <= endIndex)
             {
                 for (int i = startIndex; i <= endIndex; i++)
-                {
                     Route.Add(stationOrder[i]);
-                }
             }
             else
             {
                 for (int i = startIndex; i >= endIndex; i--)
-                {
                     Route.Add(stationOrder[i]);
-                }
             }
         }
 
@@ -90,9 +90,7 @@ namespace TrainApp.Pages
             for (int i = 0; i < stationOrder.Count; i++)
             {
                 if (name.ToLower().Contains(stationOrder[i].ToLower()))
-                {
                     return i;
-                }
             }
             return -1;
         }

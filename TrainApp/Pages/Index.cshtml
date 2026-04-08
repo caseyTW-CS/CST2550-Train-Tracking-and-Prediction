@@ -20,13 +20,6 @@
         font-size: 18px;
         margin-bottom: 2rem;
     }
-    .action-buttons {
-        display: flex;
-        justify-content: center;
-        gap: 12px;
-        margin-bottom: 2rem;
-        flex-wrap: wrap;
-    }
     .action-btn {
         padding: 12px 24px;
         border-radius: 25px;
@@ -127,59 +120,150 @@
         text-decoration: none;
     }
     .weather-widget {
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 140px;
-    background: white;
-    border-radius: 12px;
-    padding: 0.8rem;
-    border: 1px solid #e8f0f8;
-    text-align: center;
-}
-
-.weather-city {
-    font-size: 11px;
-    color: #6b7c93;
-    margin-bottom: 2px;
-}
-
-.weather-temp {
-    font-size: 28px;
-    font-weight: 600;
-    color: #2d4a7a;
-    line-height: 1;
-    margin: 4px 0;
-}
-
-.weather-desc {
-    font-size: 11px;
-    color: #6b7c93;
-    text-transform: capitalize;
-    margin-bottom: 6px;
-}
-
-.weather-icon {
-    font-size: 28px;
-    margin-bottom: 4px;
-}
-
-.weather-details {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 6px;
-    padding-top: 6px;
-    border-top: 1px solid #e8f0f8;
-    font-size: 11px;
-    color: #6b7c93;
-}
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 140px;
+        background: white;
+        border-radius: 12px;
+        padding: 0.8rem;
+        border: 1px solid #e8f0f8;
+        text-align: center;
+    }
+    .weather-city { font-size: 11px; color: #6b7c93; margin-bottom: 2px; }
+    .weather-temp { font-size: 28px; font-weight: 600; color: #2d4a7a; line-height: 1; margin: 4px 0; }
+    .weather-desc { font-size: 11px; color: #6b7c93; text-transform: capitalize; margin-bottom: 6px; }
+    .weather-icon { font-size: 28px; margin-bottom: 4px; }
+    .weather-details {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 6px;
+        padding-top: 6px;
+        border-top: 1px solid #e8f0f8;
+        font-size: 11px;
+        color: #6b7c93;
+    }
+    .home-leave-btn {
+        border: 1.5px solid #d0dce8;
+        background: white;
+        color: #2d4a7a;
+        border-radius: 20px;
+        padding: 5px 14px;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .home-leave-btn.active {
+        background: #2d4a7a;
+        color: white;
+        border-color: #2d4a7a;
+    }
+    .picker-wrap {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        flex-wrap: nowrap;
+    }
+    .roller-group {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+    }
+    .roller-label { font-size: 12px; color: #6b7c93; font-weight: 500; }
+    .roller {
+        width: 64px;
+        height: 120px;
+        overflow: hidden;
+        border: 1px solid #d0dce8;
+        border-radius: 8px;
+        position: relative;
+        background: white;
+        cursor: grab;
+        user-select: none;
+    }
+    .roller-date { width: 120px; }
+    .roller-inner { transition: transform 0.2s ease; }
+    .roller-item {
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+        color: #6b7c93;
+        transition: all 0.2s;
+    }
+    .roller-item.selected { font-size: 17px; font-weight: 600; color: #2d4a7a; }
+    .roller-overlay-top {
+        position: absolute; top: 0; left: 0; right: 0; height: 40px;
+        background: linear-gradient(to bottom, white, transparent);
+        pointer-events: none; z-index: 2;
+    }
+    .roller-overlay-bot {
+        position: absolute; bottom: 0; left: 0; right: 0; height: 40px;
+        background: linear-gradient(to top, white, transparent);
+        pointer-events: none; z-index: 2;
+    }
+    .roller-highlight {
+        position: absolute; top: 50%; transform: translateY(-50%);
+        left: 0; right: 0; height: 40px;
+        border-top: 1px solid #d0dce8;
+        border-bottom: 1px solid #d0dce8;
+        pointer-events: none; z-index: 1;
+    }
+    .ampm-wrap { display: flex; flex-direction: column; gap: 6px; margin-top: 22px; }
+    .ampm-btn {
+        width: 52px; height: 38px;
+        border: 1px solid #d0dce8; border-radius: 8px;
+        background: white; color: #6b7c93;
+        font-size: 13px; font-weight: 500; cursor: pointer;
+    }
+    .ampm-btn.active { background: #2d4a7a; color: white; border-color: #2d4a7a; }
+    .suggestion-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0; right: 0;
+        background: white;
+        border: 1px solid #d0dce8;
+        border-radius: 10px;
+        z-index: 999;
+        display: none;
+        max-height: 220px;
+        overflow-y: auto;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        text-align: left;
+    }
+    .suggestion-item {
+        padding: 10px 14px;
+        cursor: pointer;
+        font-size: 14px;
+        color: #2d4a7a;
+        border-bottom: 1px solid #f0f4f8;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .suggestion-item:last-child { border-bottom: none; }
+    .suggestion-item:hover { background: #f0f6ff; }
+    .suggestion-icon { font-size: 13px; color: #6b7c93; }
+    .roller-divider {
+        font-size: 22px;
+        color: #6b7c93;
+        padding-top: 58px;
+    }
+    .date-separator {
+        width: 1px;
+        height: 120px;
+        background: #d0dce8;
+        margin-top: 22px;
+    }
 </style>
 
 <!-- HERO SECTION -->
 <div class="hero" style="position: relative;">
 
-    <!-- WEATHER (kept exactly, just cleaner placement) -->
+    <!-- WEATHER -->
     <div class="weather-widget">
         <div class="weather-city">London, UK</div>
         <div class="weather-icon" id="weatherIcon">&#9925;</div>
@@ -192,73 +276,144 @@
     </div>
 
     <h1 class="hero-title">Where's the Train?</h1>
-    <p class="hero-subtitle">
-        Track trains, check arrivals and plan your journey
-    </p>
+    <p class="hero-subtitle">Track trains, check arrivals and plan your journey</p>
 
-    <!-- 🔥 REPLACED BUTTONS WITH SEARCH -->
+    <!-- SEARCH FORM -->
     <div style="max-width:500px; margin:auto;">
-
         <form method="post" asp-page="/FindTrain">
 
-            <input name="StartId" class="form-control mb-2"
-                   placeholder="Start station (e.g. Paddington)" />
+            <input type="hidden" name="StartId" id="homeStartId" />
+            <input type="hidden" name="StartName" id="homeStartName" />
+            <input type="hidden" name="Destination" id="homeDestName" />
+            <input type="hidden" name="StartIcs" id="homeStartIcs" />
 
-            <input name="Destination" class="form-control mb-2"
-                   placeholder="Destination (e.g. Abbey Wood)" />
+            <!-- Start Station -->
+            <div style="position:relative;" class="mb-2">
+                <input type="text" id="homeStartInput" class="form-control"
+                       placeholder="Start station (e.g. Paddington)"
+                       autocomplete="off" />
+                <div class="suggestion-dropdown" id="homeStartDropdown"></div>
+            </div>
 
-            <button class="action-btn active" style="width:100%; display:block; text-align:center;">
+            <!-- Destination -->
+            <div style="position:relative;" class="mb-2">
+                <input type="text" id="homeDestInput" class="form-control"
+                       placeholder="Destination (e.g. Abbey Wood)"
+                       autocomplete="off" />
+                <div class="suggestion-dropdown" id="homeDestDropdown"></div>
+            </div>
+
+            <!-- Leave Option -->
+            <div class="mb-2" style="text-align:left;">
+                <small style="color:#6b7c93; margin-bottom:6px; display:block;">Leave</small>
+                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
+                    <button type="button" onclick="setHomeLeave('now', this)"
+                            class="home-leave-btn active">Now</button>
+                    <button type="button" onclick="setHomeLeave('time', this)"
+                            class="home-leave-btn">Custom Time</button>
+                    <button type="button" onclick="setHomeLeave('datetime', this)"
+                            class="home-leave-btn">Custom Date & Time</button>
+                </div>
+
+                <input type="hidden" name="LeaveOption" id="homeLeaveOption" value="now" />
+                <input type="hidden" name="LeaveTime" id="homeLeaveTime" value="" />
+                <input type="hidden" name="LeaveDate" id="homeLeaveDate" value="" />
+
+                <div id="homeRollerPicker" style="display:none; margin-top:10px;">
+
+                    <!-- All Rollers on same row -->
+                    <div class="picker-wrap">
+                        <!-- Hour -->
+                        <div class="roller-group">
+                            <div class="roller-label">Hour</div>
+                            <div class="roller" id="homeHourRoller">
+                                <div class="roller-highlight"></div>
+                                <div class="roller-overlay-top"></div>
+                                <div class="roller-overlay-bot"></div>
+                                <div class="roller-inner" id="homeHourInner"></div>
+                            </div>
+                        </div>
+
+                        <!-- Colon -->
+                        <div class="roller-group">
+                            <div class="roller-label"></div>
+                            <div class="roller-divider">:</div>
+                        </div>
+
+                        <!-- Min -->
+                        <div class="roller-group">
+                            <div class="roller-label">Min</div>
+                            <div class="roller" id="homeMinRoller">
+                                <div class="roller-highlight"></div>
+                                <div class="roller-overlay-top"></div>
+                                <div class="roller-overlay-bot"></div>
+                                <div class="roller-inner" id="homeMinInner"></div>
+                            </div>
+                        </div>
+
+                        <!-- AM/PM -->
+                        <div class="ampm-wrap">
+                            <button type="button" class="ampm-btn active" id="homeAmBtn" onclick="setHomeAmPm('AM')">AM</button>
+                            <button type="button" class="ampm-btn" id="homePmBtn" onclick="setHomeAmPm('PM')">PM</button>
+                        </div>
+
+                        <!-- Date separator -->
+                        <div id="homeDateRollerWrap" style="display:none; display:flex; align-items:flex-start; gap:12px;">
+                            <div class="date-separator"></div>
+                            <div class="roller-group">
+                                <div class="roller-label">Date</div>
+                                <div class="roller roller-date" id="homeDateRoller">
+                                    <div class="roller-highlight"></div>
+                                    <div class="roller-overlay-top"></div>
+                                    <div class="roller-overlay-bot"></div>
+                                    <div class="roller-inner" id="homeDateInner"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+            <button class="action-btn active" style="width:100%; display:block; text-align:center; margin-top:10px;">
                 🔍 Find Trains
             </button>
 
         </form>
-
     </div>
 
 </div>
 
-<!-- SERVICE STATUS (UNCHANGED) -->
+<!-- SERVICE STATUS -->
 <div class="service-status">
     <div>
         <span class="status-dot" id="homeStatusDot"></span>
         <span class="status-text">Live Service Status</span>
     </div>
-
-    <p class="status-sub" id="homeStatusText">
-        Loading service status...
-    </p>
+    <p class="status-sub" id="homeStatusText">Loading service status...</p>
 </div>
 
-<!-- FEATURE CARDS (UPDATED PURPOSE) -->
+<!-- FEATURE CARDS -->
 <div class="cards-row">
-
     <div class="info-card">
-    <div class="card-icon">&#128506;</div>
-    <h3 class="card-title">Live Map</h3>
-    <p class="card-text">
-        View live train positions and track your journey on a map through the Elizabeth Line
-    </p>
-    <a href="/LiveMap" class="card-btn">View Live Map</a>
-</div>
-
+        <div class="card-icon">&#128506;</div>
+        <h3 class="card-title">Live Map</h3>
+        <p class="card-text">View live train positions and track your journey on a map through the Elizabeth Line</p>
+        <a href="/LiveMap" class="card-btn">View Live Map</a>
+    </div>
     <div class="info-card">
         <div class="card-icon">&#128643;</div>
         <h3 class="card-title">Departures Board</h3>
-        <p class="card-text">
-            Check upcoming arrivals and departures for any station on the Elizabeth Line
-        </p>
+        <p class="card-text">Check upcoming arrivals and departures for any station on the Elizabeth Line</p>
         <a href="/Departures" class="card-btn">View Departures</a>
     </div>
-
     <div class="info-card">
         <div class="card-icon">&#128276;</div>
         <h3 class="card-title">Service Alerts</h3>
-        <p class="card-text">
-            Stay updated with delays and disruptions on your route through different stations
-        </p>
+        <p class="card-text">Stay updated with delays and disruptions on your route through different stations</p>
         <a href="/Alerts" class="card-btn">View Alerts</a>
     </div>
-
 </div>
 
 <script>
@@ -284,7 +439,6 @@
             const humidity = data.main.humidity;
             const wind = Math.round(data.wind.speed * 2.237);
             const code = data.weather[0].id;
-
             document.getElementById('weatherTemp').textContent = temp + '\u00B0C';
             document.getElementById('weatherDesc').textContent = desc;
             document.getElementById('weatherHumidity').textContent = humidity + '%';
@@ -302,50 +456,208 @@ async function loadStatus() {
     try {
         const res = await fetch("https://api.tfl.gov.uk/Line/elizabeth/Status");
         const data = await res.json();
-
         const status = data[0]?.lineStatuses?.[0]?.statusSeverityDescription ?? "Good Service";
-
         const el = document.getElementById("serviceStatus");
-
         if (!el) return;
-
-        if (status.includes("Good")) {
-            el.innerHTML = "● Good Service";
-            el.style.color = "green";
-        }
-        else if (status.includes("Minor")) {
-            el.innerHTML = "● Minor Delays";
-            el.style.color = "orange";
-        }
-        else {
-            el.innerHTML = "● Severe Delays";
-            el.style.color = "red";
-        }
-
-        // ALSO update homepage dot if exists
+        if (status.includes("Good")) { el.innerHTML = "● Good Service"; el.style.color = "green"; }
+        else if (status.includes("Minor")) { el.innerHTML = "● Minor Delays"; el.style.color = "orange"; }
+        else { el.innerHTML = "● Severe Delays"; el.style.color = "red"; }
         const homeText = document.getElementById("homeStatusText");
         const homeDot = document.getElementById("homeStatusDot");
-
         if (homeText && homeDot) {
             homeText.textContent = "Elizabeth Line: " + status;
-
-            if (status.includes("Good")) {
-                homeDot.style.backgroundColor = "green";
-                homeText.style.color = "green";
-            } else if (status.includes("Minor")) {
-                homeDot.style.backgroundColor = "orange";
-                homeText.style.color = "orange";
-            } else {
-                homeDot.style.backgroundColor = "red";
-                homeText.style.color = "red";
-            }
+            if (status.includes("Good")) { homeDot.style.backgroundColor = "green"; homeText.style.color = "green"; }
+            else if (status.includes("Minor")) { homeDot.style.backgroundColor = "orange"; homeText.style.color = "orange"; }
+            else { homeDot.style.backgroundColor = "red"; homeText.style.color = "red"; }
         }
-
     } catch {
-        document.getElementById("serviceStatus").innerHTML = "● Unknown";
+        if (document.getElementById("serviceStatus"))
+            document.getElementById("serviceStatus").innerHTML = "● Unknown";
     }
 }
-
 loadStatus();
 setInterval(loadStatus, 30000);
+</script>
+
+<script>
+// ── AUTOCOMPLETE ──
+function setupAutocomplete(inputId, dropdownId, hiddenIdField, hiddenNameField) {
+    const input = document.getElementById(inputId);
+    const dropdown = document.getElementById(dropdownId);
+    let debounce;
+
+    input.addEventListener('input', () => {
+        clearTimeout(debounce);
+        const query = input.value.trim();
+        if (query.length < 4) { dropdown.style.display = 'none'; return; }
+
+debounce = setTimeout(async () => {
+    try {
+        const res = await fetch('https://api.tfl.gov.uk/Line/elizabeth/StopPoints');
+        const stations = await res.json();
+        const matches = stations.filter(s => 
+            s.commonName.toLowerCase().includes(query.toLowerCase())
+        ).slice(0, 6);
+        if (matches.length === 0) { dropdown.style.display = 'none'; return; }
+        dropdown.innerHTML = '';
+        matches.forEach(station => {
+            const item = document.createElement('div');
+            item.className = 'suggestion-item';
+            item.innerHTML = `<span class="suggestion-icon">🚉</span> ${station.commonName}`;
+            item.addEventListener('mousedown', () => {
+    input.value = station.commonName;
+    document.getElementById(hiddenIdField).value =
+        hiddenIdField === 'homeStartId' ? station.id : station.commonName;
+    if (hiddenIdField === 'homeStartId') {
+        document.getElementById('homeStartName').value = station.commonName;
+        document.getElementById('homeStartIcs').value = station.icsCode || '';
+    }
+    dropdown.style.display = 'none';
+});
+            dropdown.appendChild(item);
+        });
+        dropdown.style.display = 'block';
+    } catch { dropdown.style.display = 'none'; }
+}, 300);
+    });
+
+    document.addEventListener('click', e => {
+        if (!input.contains(e.target) && !dropdown.contains(e.target))
+            dropdown.style.display = 'none';
+    });
+}
+
+setupAutocomplete('homeStartInput', 'homeStartDropdown', 'homeStartId', null);
+setupAutocomplete('homeDestInput', 'homeDestDropdown', 'homeDestName', null);
+</script>
+
+<script>
+// ── ROLLER WITH LOOPING ──
+function buildDates() {
+    const dates = [];
+    const today = new Date();
+    const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    for (let i = 0; i < 7; i++) {
+        const d = new Date(today);
+        d.setDate(today.getDate() + i);
+        const label = i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : dayNames[d.getDay()];
+        dates.push({
+            label: label + ' · ' + d.getDate() + ' ' + monthNames[d.getMonth()],
+            value: (d.getMonth()+1).toString().padStart(2,'0') + '/' + d.getDate().toString().padStart(2,'0')
+        });
+    }
+    return dates;
+}
+
+function makeRoller(innerId, rollerId, items, labelFn, initIdx, onSelect, loop) {
+    const inner = document.getElementById(innerId);
+    if (!inner) return;
+
+    function renderItems(selectedIdx) {
+        inner.innerHTML = '';
+        const pad = document.createElement('div');
+        pad.style.height = '40px';
+        inner.appendChild(pad);
+        items.forEach((item, i) => {
+            const el = document.createElement('div');
+            el.className = 'roller-item' + (i === selectedIdx ? ' selected' : '');
+            el.textContent = labelFn(item);
+            inner.appendChild(el);
+        });
+        const pad2 = document.createElement('div');
+        pad2.style.height = '40px';
+        inner.appendChild(pad2);
+        inner.style.transform = `translateY(-${selectedIdx * 40}px)`;
+    }
+
+    renderItems(initIdx);
+
+    const roller = document.getElementById(rollerId);
+    let startY, startIdx = initIdx, currentIdx = initIdx;
+    let wheelAccum = 0;
+
+    function updateIdx(newIdx) {
+        if (loop) {
+            newIdx = ((newIdx % items.length) + items.length) % items.length;
+        } else {
+            newIdx = Math.max(0, Math.min(items.length - 1, newIdx));
+        }
+        currentIdx = newIdx;
+        startIdx = newIdx;
+        inner.style.transform = `translateY(-${currentIdx * 40}px)`;
+        [...inner.querySelectorAll('.roller-item')].forEach((el, i) => {
+            el.className = 'roller-item' + (i === currentIdx ? ' selected' : '');
+        });
+        onSelect(currentIdx);
+    }
+
+    roller.addEventListener('mousedown', e => { startY = e.clientY; roller.style.cursor = 'grabbing'; });
+    window.addEventListener('mousemove', e => {
+        if (startY === undefined) return;
+        const steps = Math.round((startY - e.clientY) / 40);
+        if (steps === 0) return;
+        let newIdx = startIdx + steps;
+        if (loop) {
+            newIdx = ((newIdx % items.length) + items.length) % items.length;
+        } else {
+            newIdx = Math.max(0, Math.min(items.length - 1, newIdx));
+        }
+        if (newIdx !== currentIdx) {
+            currentIdx = newIdx;
+            inner.style.transform = `translateY(-${currentIdx * 40}px)`;
+            [...inner.querySelectorAll('.roller-item')].forEach((el, i) => {
+                el.className = 'roller-item' + (i === currentIdx ? ' selected' : '');
+            });
+            onSelect(currentIdx);
+        }
+    });
+    window.addEventListener('mouseup', () => {
+        if (startY !== undefined) { startIdx = currentIdx; startY = undefined; roller.style.cursor = 'grab'; }
+    });
+    roller.addEventListener('wheel', e => {
+        e.preventDefault();
+        wheelAccum += e.deltaY;
+        if (Math.abs(wheelAccum) < 80) return;
+        const dir = wheelAccum > 0 ? 1 : -1;
+        wheelAccum = 0;
+        updateIdx(currentIdx + dir);
+    }, { passive: false });
+}
+
+const homeHours = [1,2,3,4,5,6,7,8,9,10,11,12];
+const homeMins = ['00','15','30','45'];
+const homeDates = buildDates();
+let homeSelH = 0, homeSelM = 0, homeSelD = 0, homeAmPm = 'AM';
+
+function initHomeRollers() {
+    makeRoller('homeHourInner', 'homeHourRoller', homeHours, h => h, homeSelH, i => { homeSelH = i; updateHomeHidden(); }, true);
+    makeRoller('homeMinInner', 'homeMinRoller', homeMins, m => m, homeSelM, i => { homeSelM = i; updateHomeHidden(); }, true);
+    makeRoller('homeDateInner', 'homeDateRoller', homeDates, d => d.label, homeSelD, i => { homeSelD = i; updateHomeHidden(); }, false);
+}
+
+function updateHomeHidden() {
+    const h = homeHours[homeSelH];
+    const m = homeMins[homeSelM];
+    let h24 = homeAmPm === 'AM' ? (h === 12 ? 0 : h) : (h === 12 ? 12 : h + 12);
+    document.getElementById('homeLeaveTime').value = h24.toString().padStart(2,'0') + ':' + m;
+    document.getElementById('homeLeaveDate').value = homeDates[homeSelD].value;
+}
+
+function setHomeAmPm(val) {
+    homeAmPm = val;
+    document.getElementById('homeAmBtn').className = 'ampm-btn' + (val === 'AM' ? ' active' : '');
+    document.getElementById('homePmBtn').className = 'ampm-btn' + (val === 'PM' ? ' active' : '');
+    updateHomeHidden();
+}
+
+function setHomeLeave(option, el) {
+    document.getElementById('homeLeaveOption').value = option;
+    document.querySelectorAll('.home-leave-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('homeRollerPicker').style.display = option !== 'now' ? 'block' : 'none';
+    const dateWrap = document.getElementById('homeDateRollerWrap');
+    dateWrap.style.display = option === 'datetime' ? 'flex' : 'none';
+    if (option !== 'now') { initHomeRollers(); updateHomeHidden(); }
+}
 </script>

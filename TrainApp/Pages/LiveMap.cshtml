@@ -18,13 +18,11 @@
             font-family: 'Segoe UI', sans-serif;
         }
 
-        /* split page into left panel and right map */
         .page-wrap {
             display: flex;
             height: 100vh;
         }
 
-        /* left search panel */
         .left-panel {
             width: 300px;
             flex-shrink: 0;
@@ -37,13 +35,16 @@
             flex-direction: column;
         }
 
-        /* dark header */
         .panel-header {
-            padding: 1.5rem;
+            padding: 1.2rem 1.5rem;
             background: #4B4E6D;
             color: white;
-            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
+
+        .panel-header-text { text-align: center; flex: 1; }
 
         .panel-header h2 {
             font-size: 1.4rem;
@@ -54,12 +55,26 @@
         .panel-header p {
             font-size: 0.8rem;
             opacity: 0.8;
+            margin: 0;
         }
 
-        /* search box */
+        .panel-theme-btn {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 50%;
+            transition: transform 0.3s;
+            flex-shrink: 0;
+        }
+
+        .panel-theme-btn:hover { transform: rotate(20deg); }
+
         .search-box {
             padding: 1.2rem;
             border-bottom: 1px solid #e8edf8;
+            position: relative;
         }
 
         .search-box label {
@@ -93,11 +108,37 @@
             cursor: pointer;
         }
 
-        .search-box button:hover {
-            background: #3a3d58;
+        .search-box button:hover { background: #3a3d58; }
+
+        .map-suggestion-dropdown {
+            position: absolute;
+            left: 1.2rem;
+            right: 1.2rem;
+            top: auto;
+            background: white;
+            border: 1px solid #c5d5e8;
+            border-radius: 8px;
+            z-index: 9999;
+            display: none;
+            max-height: 200px;
+            overflow-y: auto;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
-        /* train results */
+        .map-suggestion-item {
+            padding: 9px 12px;
+            font-size: 0.85rem;
+            color: #2c2f4a;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f4f8;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .map-suggestion-item:last-child { border-bottom: none; }
+        .map-suggestion-item:hover { background: #f0f6fb; }
+
         .results-section {
             padding: 1rem;
             flex: 1;
@@ -121,9 +162,7 @@
             cursor: pointer;
         }
 
-        .train-item:hover {
-            background: #e8f0fb;
-        }
+        .train-item:hover { background: #e8f0fb; }
 
         .train-item b {
             color: #1a2f5a;
@@ -144,270 +183,335 @@
             margin-top: 1rem;
         }
 
-        /* map fills the rest */
         #map {
             flex: 1;
             height: 100vh;
         }
 
-        /* 🔙 navigation arrows */
-.nav-btn {
-    position: fixed;
-    top: 15px;
-    z-index: 2000;
-    background: rgba(75, 78, 109, 0.9);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 42px;
-    height: 42px;
-    font-size: 20px;
-    cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-}
+        .nav-btn {
+            position: fixed;
+            top: 15px;
+            z-index: 2000;
+            background: rgba(75, 78, 109, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 42px;
+            height: 42px;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
 
-.nav-btn:hover {
-    background: #3a3d58;
-}
+        .nav-btn:hover { background: #3a3d58; }
+        .back-btn { left: 15px; }
+        .forward-btn { right: 15px; }
 
-/* left + right positions */
-.back-btn {
-    left: 15px;
-}
-
-.forward-btn {
-    right: 15px;
-}
-
+        /* ── DARK MODE ── */
+        body.dark-mode { background: #0f1b2d !important; }
+        body.dark-mode .left-panel {
+            background: #1a2a42 !important;
+            box-shadow: 3px 0 15px rgba(0,0,0,0.4) !important;
+        }
+        body.dark-mode .panel-header { background: #243650 !important; }
+        body.dark-mode .search-box { border-bottom-color: #2a3f5f !important; }
+        body.dark-mode .search-box label { color: #a8c4e8 !important; }
+        body.dark-mode .search-box input {
+            background: #0f1b2d !important;
+            border-color: #2a3f5f !important;
+            color: #c9d8f0 !important;
+        }
+        body.dark-mode .search-box input::placeholder { color: #4a6a8a !important; }
+        body.dark-mode .search-box button { background: #3a5a8a !important; }
+        body.dark-mode .search-box button:hover { background: #2a4a7a !important; }
+        body.dark-mode .map-suggestion-dropdown {
+            background: #1a2a42 !important;
+            border-color: #2a3f5f !important;
+        }
+        body.dark-mode .map-suggestion-item {
+            color: #c9d8f0 !important;
+            border-bottom-color: #2a3f5f !important;
+        }
+        body.dark-mode .map-suggestion-item:hover { background: #243650 !important; }
+        body.dark-mode .results-title { color: #4a6a8a !important; }
+        body.dark-mode .train-item {
+            background: #1f3350 !important;
+            border-left-color: #3a5a8a !important;
+        }
+        body.dark-mode .train-item:hover { background: #243650 !important; }
+        body.dark-mode .train-item b { color: #a8c4e8 !important; }
+        body.dark-mode .train-item span { color: #7a9bc4 !important; }
+        body.dark-mode .nav-btn { background: rgba(26, 42, 66, 0.9) !important; }
+        body.dark-mode .nav-btn:hover { background: #243650 !important; }
     </style>
 </head>
 <body>
+
     <button class="nav-btn back-btn" id="backBtn">←</button>
-<button class="nav-btn forward-btn" id="nextBtn">→</button>
+    <button class="nav-btn forward-btn" id="nextBtn">→</button>
 
-<div class="page-wrap">
+    <div class="page-wrap">
 
-    <!-- LEFT PANEL -->
-    <div class="left-panel">
+        <!-- LEFT PANEL -->
+        <div class="left-panel">
 
-        <div class="panel-header">
-            <h2>🗺️ Live Map</h2>
-            <p>Track live trains on the Elizabeth Line</p>
+            <div class="panel-header">
+                <div class="panel-header-text">
+                    <h2>🗺️ Live Map</h2>
+                    <p>Track live trains on the Elizabeth Line</p>
+                </div>
+                <button class="panel-theme-btn" id="mapThemeToggle" title="Toggle dark mode">🌙</button>
+            </div>
+
+            <div class="search-box">
+                <label>Search by Station or Train ID</label>
+                <input type="text" id="searchInput" placeholder="e.g. Paddington or 123" autocomplete="off" />
+                <div class="map-suggestion-dropdown" id="mapSuggestions"></div>
+                <button onclick="searchTrain()">&#128269; Search</button>
+            </div>
+
+            <div class="results-section">
+                <div class="results-title" id="resultsTitle">All Live Trains</div>
+                <div id="resultsList"></div>
+            </div>
+
         </div>
 
-        <!-- search box -->
-        <div class="search-box">
-            <label>Search by Station or Train ID</label>
-            <input type="text" id="searchInput" placeholder="e.g. Paddington or 123" />
-            <button onclick="searchTrain()">&#128269; Search</button>
-        </div>
-
-        <!-- results list -->
-        <div class="results-section">
-            <div class="results-title" id="resultsTitle">All Live Trains</div>
-            <div id="resultsList"></div>
-        </div>
+        <!-- MAP -->
+        <div id="map"></div>
 
     </div>
 
-    <!-- MAP -->
-    <div id="map"></div>
-
-</div>
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
-    // all live trains passed from the backend
-    const allTrains = [
-        @foreach (var train in Model.trains)
-        {
-            <text>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        const allTrains = [
+            @foreach (var train in Model.trains)
             {
-                vehicleId: "@train.vehicleId",
-                stationName: "@(train.stationName?.Replace("\"", "")?.Replace(" Rail Station", "")?.Replace(" Underground Station", ""))",
-                destinationName: "@(train.destinationName?.Replace("\"", "")?.Replace(" Rail Station", ""))",
-                timeToStation: @train.timeToStation,
-                currentLocation: "@train.currentLocation",
-                platformName: "@train.platformName"
-            },
-            </text>
+                <text>
+                {
+                    vehicleId: "@train.vehicleId",
+                    stationName: "@(train.stationName?.Replace("\"", "")?.Replace(" Rail Station", "")?.Replace(" Underground Station", ""))",
+                    destinationName: "@(train.destinationName?.Replace("\"", "")?.Replace(" Rail Station", ""))",
+                    timeToStation: @train.timeToStation,
+                    currentLocation: "@train.currentLocation",
+                    platformName: "@train.platformName"
+                },
+                </text>
+            }
+        ];
+
+        const elizabethStations = [
+            { name: "Reading",              lat: 51.4587, lng: -0.9719 },
+            { name: "Twyford",              lat: 51.4754, lng: -0.8614 },
+            { name: "Maidenhead",           lat: 51.5183, lng: -0.7177 },
+            { name: "Slough",               lat: 51.5113, lng: -0.5950 },
+            { name: "West Drayton",         lat: 51.5096, lng: -0.4472 },
+            { name: "Hayes & Harlington",   lat: 51.5069, lng: -0.4225 },
+            { name: "Southall",             lat: 51.5057, lng: -0.3776 },
+            { name: "Ealing Broadway",      lat: 51.5152, lng: -0.3017 },
+            { name: "Paddington",           lat: 51.5154, lng: -0.1755 },
+            { name: "Bond Street",          lat: 51.5142, lng: -0.1494 },
+            { name: "Tottenham Court Road", lat: 51.5165, lng: -0.1299 },
+            { name: "Farringdon",           lat: 51.5203, lng: -0.1051 },
+            { name: "Liverpool Street",     lat: 51.5183, lng: -0.0823 },
+            { name: "Whitechapel",          lat: 51.5197, lng: -0.0594 },
+            { name: "Stratford",            lat: 51.5416, lng: -0.0042 },
+            { name: "Romford",              lat: 51.5752, lng:  0.1833 },
+            { name: "Shenfield",            lat: 51.6297, lng:  0.3267 },
+            { name: "Shadwell",             lat: 51.5113, lng: -0.0569 },
+            { name: "Canada Water",         lat: 51.4982, lng: -0.0502 },
+            { name: "Abbey Wood",           lat: 51.4908, lng:  0.1198 }
+        ];
+
+        const map = L.map('map', { zoomControl: true }).setView([51.509, -0.118], 11);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        const routeCoords = elizabethStations.map(s => [s.lat, s.lng]);
+        L.polyline(routeCoords, { color: '#6950a1', weight: 4, opacity: 0.8 }).addTo(map);
+
+        elizabethStations.forEach(s => {
+            L.circleMarker([s.lat, s.lng], {
+                radius: 5,
+                color: '#6950a1',
+                fillColor: 'white',
+                fillOpacity: 1,
+                weight: 2
+            }).addTo(map).bindPopup(s.name);
+        });
+
+        let trainLayer = L.layerGroup().addTo(map);
+
+        function drawTrains(trains) {
+            trainLayer.clearLayers();
+            trains.forEach(t => {
+                const match = elizabethStations.find(s =>
+                    t.stationName.toLowerCase().includes(s.name.toLowerCase())
+                );
+                if (match) {
+                    const mins = Math.round(t.timeToStation / 60);
+                    const icon = L.divIcon({
+                        html: '🚂',
+                        className: '',
+                        iconSize: [24, 24],
+                        iconAnchor: [12, 12]
+                    });
+                    L.marker([match.lat, match.lng], { icon })
+                        .addTo(trainLayer)
+                        .bindPopup(`
+                            <b>Train ${t.vehicleId}</b><br>
+                            To: ${t.destinationName}<br>
+                            Next stop: ${t.stationName}<br>
+                            Arrives in: ${mins} mins<br>
+                            Platform: ${t.platformName || '--'}
+                        `);
+                }
+            });
         }
-    ];
 
-    // elizabeth line stations with coordinates
-    const elizabethStations = [
-        { name: "Reading",              lat: 51.4587, lng: -0.9719 },
-        { name: "Twyford",              lat: 51.4754, lng: -0.8614 },
-        { name: "Maidenhead",           lat: 51.5183, lng: -0.7177 },
-        { name: "Slough",               lat: 51.5113, lng: -0.5950 },
-        { name: "West Drayton",         lat: 51.5096, lng: -0.4472 },
-        { name: "Hayes & Harlington",   lat: 51.5069, lng: -0.4225 },
-        { name: "Southall",             lat: 51.5057, lng: -0.3776 },
-        { name: "Ealing Broadway",      lat: 51.5152, lng: -0.3017 },
-        { name: "Paddington",           lat: 51.5154, lng: -0.1755 },
-        { name: "Bond Street",          lat: 51.5142, lng: -0.1494 },
-        { name: "Tottenham Court Road", lat: 51.5165, lng: -0.1299 },
-        { name: "Farringdon",           lat: 51.5203, lng: -0.1051 },
-        { name: "Liverpool Street",     lat: 51.5183, lng: -0.0823 },
-        { name: "Whitechapel",          lat: 51.5197, lng: -0.0594 },
-        { name: "Stratford",            lat: 51.5416, lng: -0.0042 },
-        { name: "Romford",              lat: 51.5752, lng:  0.1833 },
-        { name: "Shenfield",            lat: 51.6297, lng:  0.3267 },
-        { name: "Shadwell",             lat: 51.5113, lng: -0.0569 },
-        { name: "Canada Water",         lat: 51.4982, lng: -0.0502 },
-        { name: "Abbey Wood",           lat: 51.4908, lng:  0.1198 }
-    ];
+        function showResults(trains) {
+            const list = document.getElementById('resultsList');
+            const title = document.getElementById('resultsTitle');
 
-    // set up map centred on london
-    const map = L.map('map').setView([51.509, -0.118], 11);
+            if (trains.length === 0) {
+                list.innerHTML = '<div class="no-results">No trains found</div>';
+                title.textContent = '0 trains found';
+                return;
+            }
 
-    // load openstreetmap tiles
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
+            title.textContent = trains.length + ' train(s) found';
+            list.innerHTML = trains.map(t => {
+                const mins = Math.round(t.timeToStation / 60);
+                return `
+                    <div class="train-item" onclick="zoomToTrain('${t.stationName}')">
+                        <b>🚂 ${t.vehicleId}</b>
+                        <span>To: ${t.destinationName}</span>
+                        <span>Next: ${t.stationName} in ${mins} mins</span>
+                    </div>
+                `;
+            }).join('');
+        }
 
-    // draw the elizabeth line route as a purple line
-    const routeCoords = elizabethStations.map(s => [s.lat, s.lng]);
-    L.polyline(routeCoords, { color: '#6950a1', weight: 4, opacity: 0.8 }).addTo(map);
-
-    // add station dots on the map
-    elizabethStations.forEach(s => {
-        L.circleMarker([s.lat, s.lng], {
-            radius: 5,
-            color: '#6950a1',
-            fillColor: 'white',
-            fillOpacity: 1,
-            weight: 2
-        }).addTo(map).bindPopup(s.name);
-    });
-
-    // layer group for train markers so we can clear and redraw
-    let trainLayer = L.layerGroup().addTo(map);
-
-    // draw train markers on the map for a given list of trains
-    function drawTrains(trains) {
-        trainLayer.clearLayers();
-        trains.forEach(t => {
+        function zoomToTrain(stationName) {
             const match = elizabethStations.find(s =>
-                t.stationName.toLowerCase().includes(s.name.toLowerCase())
+                stationName.toLowerCase().includes(s.name.toLowerCase())
             );
             if (match) {
-                const mins = Math.round(t.timeToStation / 60);
-                const icon = L.divIcon({
-                    html: '🚂',
-                    className: '',
-                    iconSize: [24, 24],
-                    iconAnchor: [12, 12]
+                map.flyTo([match.lat, match.lng], 15, {
+                    animate: true,
+                    duration: 1.2
                 });
-                L.marker([match.lat, match.lng], { icon })
-                    .addTo(trainLayer)
-                    .bindPopup(`
-                        <b>Train ${t.vehicleId}</b><br>
-                        To: ${t.destinationName}<br>
-                        Next stop: ${t.stationName}<br>
-                        Arrives in: ${mins} mins<br>
-                        Platform: ${t.platformName || '--'}
-                    `);
             }
-        });
-    }
-
-    // show train cards in the left panel
-    function showResults(trains) {
-        const list = document.getElementById('resultsList');
-        const title = document.getElementById('resultsTitle');
-
-        if (trains.length === 0) {
-            list.innerHTML = '<div class="no-results">No trains found</div>';
-            title.textContent = '0 trains found';
-            return;
         }
 
-        title.textContent = trains.length + ' train(s) found';
-        list.innerHTML = trains.map(t => {
-            const mins = Math.round(t.timeToStation / 60);
-            return `
-                <div class="train-item" onclick="zoomToTrain('${t.stationName}')">
-                    <b>🚂 ${t.vehicleId}</b>
-                    <span>To: ${t.destinationName}</span>
-                    <span>Next: ${t.stationName} in ${mins} mins</span>
-                </div>
-            `;
-        }).join('');
-    }
+        function searchTrain() {
+            const query = document.getElementById('searchInput').value.trim().toLowerCase();
+            document.getElementById('mapSuggestions').style.display = 'none';
 
-    // zoom map to a specific station when train card is clicked
-    function zoomToTrain(stationName) {
-    const match = elizabethStations.find(s =>
-        stationName.toLowerCase().includes(s.name.toLowerCase())
-    );
-    if (match) {
-        // zoom in closer and animate smoothly
-        map.flyTo([match.lat, match.lng], 15, {
-            animate: true,
-            duration: 1.2
-        });
-    }
-}
+            if (query === '') {
+                drawTrains(allTrains);
+                showResults(allTrains);
+                return;
+            }
 
-    // filter trains by station name or train id
-    function searchTrain() {
-        const query = document.getElementById('searchInput').value.trim().toLowerCase();
+            const filtered = allTrains.filter(t =>
+                t.vehicleId.toLowerCase().includes(query) ||
+                t.stationName.toLowerCase().includes(query) ||
+                t.destinationName.toLowerCase().includes(query)
+            );
 
-        if (query === '') {
-            // show all trains if search is empty
-            drawTrains(allTrains);
-            showResults(allTrains);
-            return;
+            drawTrains(filtered);
+            showResults(filtered);
+
+            if (filtered.length > 0) {
+                zoomToTrain(filtered[0].stationName);
+            }
         }
 
-        const filtered = allTrains.filter(t =>
-            t.vehicleId.toLowerCase().includes(query) ||
-            t.stationName.toLowerCase().includes(query) ||
-            t.destinationName.toLowerCase().includes(query)
-        );
+        // ── AUTOCOMPLETE ──
+        const searchInput = document.getElementById('searchInput');
+        const suggestionsBox = document.getElementById('mapSuggestions');
+        let debounce;
 
-        drawTrains(filtered);
-        showResults(filtered);
+        searchInput.addEventListener('input', () => {
+            clearTimeout(debounce);
+            const query = searchInput.value.trim();
+            if (query.length < 4) { suggestionsBox.style.display = 'none'; return; }
 
-        // zoom to first result if found
-        if (filtered.length > 0) {
-            zoomToTrain(filtered[0].stationName);
+            debounce = setTimeout(async () => {
+                try {
+                    const res = await fetch(`https://api.tfl.gov.uk/StopPoint/Search/${encodeURIComponent(query)}?modes=elizabeth-line&maxResults=5`);
+                    const data = await res.json();
+                    const matches = data.matches || [];
+
+                    if (matches.length === 0) { suggestionsBox.style.display = 'none'; return; }
+
+                    suggestionsBox.innerHTML = '';
+                    matches.forEach(station => {
+                        const item = document.createElement('div');
+                        item.className = 'map-suggestion-item';
+                        item.innerHTML = `🚉 ${station.name}`;
+                        item.addEventListener('mousedown', () => {
+                            searchInput.value = station.name;
+                            suggestionsBox.style.display = 'none';
+                            searchTrain();
+                        });
+                        suggestionsBox.appendChild(item);
+                    });
+                    suggestionsBox.style.display = 'block';
+                } catch { suggestionsBox.style.display = 'none'; }
+            }, 300);
+        });
+
+        document.addEventListener('click', e => {
+            if (!searchInput.contains(e.target) && !suggestionsBox.contains(e.target))
+                suggestionsBox.style.display = 'none';
+        });
+
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') searchTrain();
+        });
+
+        drawTrains(allTrains);
+        showResults(allTrains);
+
+        // Refresh trains every 30s without resetting map view
+        async function refreshTrains() {
+            try {
+                const res = await fetch('/LiveMap?handler=Trains');
+                const data = await res.json();
+                if (data && data.length) {
+                    drawTrains(data);
+                    showResults(data);
+                }
+            } catch {}
         }
-    }
 
-    // allow pressing enter to search
-    document.getElementById('searchInput').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') searchTrain();
-    });
+        setInterval(refreshTrains, 30000);
 
-    // load all trains on page open
-    drawTrains(allTrains);
-    showResults(allTrains);
-
-    // refresh page every 30 seconds to get fresh train data
-    setTimeout(() => location.reload(), 30000);
-
-// 🔙 navigation buttons (SAFE VERSION)
-document.addEventListener("DOMContentLoaded", () => {
-
-    const backBtn = document.getElementById("backBtn");
-    const nextBtn = document.getElementById("nextBtn");
-
-    if (backBtn) {
-        backBtn.addEventListener("click", () => {
-            window.location.href = "/";
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById("backBtn").addEventListener("click", () => {
+                window.location.href = "/";
+            });
+            document.getElementById("nextBtn").addEventListener("click", () => {
+                window.location.href = "/Departures";
+            });
         });
-    }
 
-    if (nextBtn) {
-        nextBtn.addEventListener("click", () => {
-            window.location.href = "/Departures";
+        // ── DARK MODE ──
+        document.getElementById('mapThemeToggle').addEventListener('click', () => {
+            const isDark = document.body.classList.toggle('dark-mode');
+            document.getElementById('mapThemeToggle').textContent = isDark ? '☀️' : '🌙';
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
         });
-    }
 
-});
-</script>
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('mapThemeToggle').textContent = '☀️';
+        }
+    </script>
 
 </body>
 </html>

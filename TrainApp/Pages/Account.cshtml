@@ -2,24 +2,85 @@
 @model TrainApp.Pages.AccountModel
 
 @{
-ViewData["Title"] = "My Account";
+    ViewData["Title"] = "My Account";
 }
 
-<!-- page header -->
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
 
-<div class="text-center mb-4">
-    <h1 class="display-4">My Account</h1>
-    <p class="lead">Manage your LineTrack settings and preferences</p>
-</div>
+<style>
+    body {
+        background-color: #a8d4e8;
+        font-family: 'Inter', sans-serif;
+    }
 
-<div class="row justify-content-center">
-    <div class="col-md-8">
+    .account-title {
+        font-family: 'Dancing Script', cursive;
+        font-size: 2.5rem;
+        color: #1a2f5a;
+    }
 
+    .account-wrapper {
+        max-width: 900px;
+        margin: 30px auto;
+        background: rgba(255,255,255,0.35);
+        padding: 30px;
+        border-radius: 20px;
+    }
 
-    <!-- account details card -->
-    <div class="card p-4 mb-4">
-        <h3 class="mb-3">Account Details</h3>
-        <table class="table">
+    .account-card {
+        background: rgba(255,255,255,0.95);
+        border-radius: 14px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .account-card h4 {
+        margin-bottom: 15px;
+        color: #1a2f5a;
+    }
+
+    .input-group input {
+        border-radius: 10px 0 0 10px;
+    }
+
+    .input-group button {
+        border-radius: 0 10px 10px 0;
+    }
+
+    .list-group-item {
+        border-radius: 10px !important;
+        margin-bottom: 6px;
+        border: none;
+        background: #f8f9fa;
+    }
+
+    .empty-text {
+        text-align: center;
+        padding: 20px;
+        color: #6c757d;
+    }
+
+    .danger-btn {
+        border-radius: 10px;
+    }
+</style>
+
+<div class="account-wrapper">
+
+    <!-- TITLE -->
+    <h2 class="text-center account-title mb-2">My Account</h2>
+    <p class="text-center text-muted mb-4">
+        Manage your LineTrack settings and preferences
+    </p>
+
+    <!-- ACCOUNT DETAILS -->
+    <div class="account-card">
+        <h4>👤 Account Details</h4>
+
+        <table class="table mb-0">
             <tr>
                 <td class="text-muted">Username</td>
                 <td>@Model.userName</td>
@@ -39,53 +100,51 @@ ViewData["Title"] = "My Account";
         </table>
     </div>
 
-    <!-- favourite stations card -->
-    <div class="card p-4 mb-4">
-        <h3 class="mb-3">Favourite Stations</h3>
+    <!-- FAVOURITES -->
+    <div class="account-card">
+        <h4>⭐ Favourite Stations</h4>
 
-        <!-- add favourite station -->
         <form method="post" asp-page-handler="AddFavourite">
-    <div class="input-group mb-3">
-        <input name="stationName" class="form-control" placeholder="Add a favourite station e.g. Paddington" />
-        <button class="btn btn-primary" type="submit">Add</button>
-    </div>
+            <div class="input-group mb-3">
+                <input name="stationName" class="form-control"
+                       placeholder="Add a favourite station e.g. Paddington" />
+                <button class="btn btn-primary">Add</button>
+            </div>
         </form>
 
-        <!-- list of favourites -->
         <ul class="list-group">
-    @if (Model.favouriteStations.Count == 0)
-    {
-        <li class="list-group-item text-muted">No favourite stations added yet</li>
-    }
-    else
-    {
-        @foreach (var station in Model.favouriteStations)
-        {
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-                @station
+            @if (Model.favouriteStations.Count == 0)
+            {
+                <div class="empty-text">No favourite stations added yet</div>
+            }
+            else
+            {
+                @foreach (var station in Model.favouriteStations)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        🚉 @station
 
-                <form method="post" asp-page-handler="RemoveFavourite">
-                    <input type="hidden" name="stationName" value="@station" />
-                    <button class="btn btn-sm btn-danger">Remove</button>
-                </form>
-            </li>
-        }
-    }
-</ul>
-    </div>
-
-    <!-- recent searches card -->
-    <div class="card p-4">
-        <h3 class="mb-3">Recent Searches</h3>
-        <ul class="list-group">
-            <li class="list-group-item text-muted">No recent searches</li>
+                        <form method="post" asp-page-handler="RemoveFavourite">
+                            <input type="hidden" name="stationName" value="@station" />
+                            <button class="btn btn-sm btn-danger">Remove</button>
+                        </form>
+                    </li>
+                }
+            }
         </ul>
-
-        <!-- clear recent searches button -->
-        <button class="btn btn-outline-danger mt-3">Clear Recent Searches</button>
     </div>
 
-</div>
+    <!-- RECENT SEARCHES -->
+    <div class="account-card">
+        <h4>🕓 Recent Searches</h4>
 
+        <div class="empty-text">
+            No recent searches
+        </div>
+
+        <button class="btn btn-outline-danger mt-3 danger-btn w-100">
+            Clear Recent Searches
+        </button>
+    </div>
 
 </div>

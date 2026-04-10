@@ -62,6 +62,7 @@ This application is designed to provide a simple and accessible way for users to
 The application uses the Transport for London (TfL) API:
 
 https://api.tfl.gov.uk/Line/elizabeth
+https://api.tfl.gov.uk
 
 This provides:
 - Service status information

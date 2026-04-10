@@ -91,8 +91,6 @@ The application follows a structured approach using Razor Pages, separating conc
 
 ## Authors
 
-### Developed By:
-
 Casey Tyler Woods 
 
 Rishon Ramdany

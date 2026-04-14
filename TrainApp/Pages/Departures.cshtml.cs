@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Text.Json;
+using TrainApp.Models;
 
 namespace TrainApp.Pages
 {
@@ -8,6 +9,7 @@ namespace TrainApp.Pages
     {
         private readonly HttpClient _http = new();
 
+        // Simple model used to display train data on the page
         public class Train
         {
             public string? destination { get; set; }
@@ -15,8 +17,15 @@ namespace TrainApp.Pages
             public string? platform { get; set; }
         }
 
+        // Lists used to store trains for display
         public List<Train> results { get; set; } = new();
         public List<Train> arrivals { get; set; } = new();
+
+        // Stores any disruptions detected from delays
+        public List<Disruption> Disruptions { get; set; } = new();
+
+        // Dictionary allows quick lookup of disruptions by ID
+        public Dictionary<string, Disruption> DisruptionMap { get; set; } = new();
 
         public string? searchedStation { get; set; }
 
@@ -25,7 +34,7 @@ namespace TrainApp.Pages
 
         public async Task OnGet(string? stationName)
         {
-            // Pre-fill and auto-search when arriving from the favourites dropdown
+            // If the user comes from favourites, automatically run a search
             if (!string.IsNullOrWhiteSpace(stationName))
             {
                 this.stationName = stationName;
@@ -66,6 +75,7 @@ namespace TrainApp.Pages
                     .Take(8)
                     .ToList();
 
+                // Convert API data into something the UI can use
                 foreach (var t in trains)
                 {
                     var timeText = FormatTime(t.expectedArrival);
@@ -84,14 +94,79 @@ namespace TrainApp.Pages
                         platform = CleanPlatform(t.platformName)
                     });
                 }
+
+                // Create journey objects so we can apply disruption logic
+                var journeys = new List<Journey>();
+
+                foreach (var t in trains)
+                {
+                    int delay = t.expectedArrival > DateTime.UtcNow
+                        ? (int)(t.expectedArrival - DateTime.UtcNow).TotalMinutes
+                        : 0;
+
+                    // Minimal objects just to connect into the backend logic
+                    var trainObj = new TrainApp.Models.Train(
+                    "Elizabeth Line",
+                    "TfL",
+                    1000,
+                    90
+                    );
+
+                    var departureStationObj = new Station(
+                        searchedStation,
+                        "Elizabeth Line",
+                        5,
+                        new GeoCoords(0, 0)
+                    );
+
+                    var arrivalStationObj = new Station(
+                        t.destinationName ?? "Unknown",
+                        "Elizabeth Line",
+                        5,
+                        new GeoCoords(0, 0)
+                    );
+
+                    var journey = new Journey(
+                        Guid.NewGuid().ToString(),
+                        trainObj,
+                        departureStationObj,
+                        arrivalStationObj,
+                        DateTime.Now,
+                        t.expectedArrival
+                    );
+
+                    journey.updateDelay(delay);
+
+                    journeys.Add(journey);
+                }
+
+                // If any journeys are delayed, create a disruption
+                if (journeys.Any(j => j.currentDelayMinutes > 0))
+                {
+                    int maxDelay = journeys.Max(j => j.currentDelayMinutes);
+
+                    var disruption = new Disruption(
+                        Guid.NewGuid().ToString(),
+                        $"Delays at {searchedStation}",
+                        maxDelay,
+                        Disruption.calculateSeverity(maxDelay)
+                    );
+
+                    // Apply logic from the Disruption class
+                    disruption.scanJourneysForDelays(journeys);
+
+                    // Store results in both list and dictionary
+                    Disruptions.Add(disruption);
+                    DisruptionMap[disruption.disruptionId] = disruption;
+                }
             }
             catch
             {
-                // keep page alive if TfL is unavailable
+                // If the API fails, just keep the page running
             }
         }
 
-        // 🔥 ADD THIS METHOD (this is what fixes everything)
+        // Used by JavaScript to refresh live data
         public async Task<IActionResult> OnGetDataAsync(string station)
         {
             if (string.IsNullOrWhiteSpace(station))
@@ -131,6 +206,7 @@ namespace TrainApp.Pages
             }
         }
 
+        // Finds the correct stop ID from TfL using the station name
         private async Task<string?> FindElizabethStopIdAsync(string station)
         {
             var searchUrl =
@@ -151,6 +227,7 @@ namespace TrainApp.Pages
                 if (string.IsNullOrWhiteSpace(id))
                     continue;
 
+                // Elizabeth line stations usually start with this prefix
                 if (id.StartsWith("910G", StringComparison.OrdinalIgnoreCase))
                     return id;
 
@@ -162,6 +239,7 @@ namespace TrainApp.Pages
             return null;
         }
 
+        // Converts API time into something readable
         private string FormatTime(DateTime expectedArrival)
         {
             var diff = expectedArrival - DateTime.UtcNow;
@@ -175,6 +253,7 @@ namespace TrainApp.Pages
             return expectedArrival.ToLocalTime().ToString("HH:mm");
         }
 
+        // Cleans platform text (e.g. removes "Platform ")
         private string CleanPlatform(string? platformName)
         {
             if (string.IsNullOrWhiteSpace(platformName))
@@ -183,6 +262,7 @@ namespace TrainApp.Pages
             return platformName.Replace("Platform ", "", StringComparison.OrdinalIgnoreCase).Trim();
         }
 
+        // Model for TfL API response
         public class TflArrival
         {
             public string? destinationName { get; set; }

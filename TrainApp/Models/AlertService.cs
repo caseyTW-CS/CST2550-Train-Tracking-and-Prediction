@@ -22,14 +22,17 @@ namespace TrainApp.Models
 
             try
             {
+                // call TfL API for Elizabeth Line status
                 string url = "https://api.tfl.gov.uk/Line/elizabeth/Status";
                 var response = await _http.GetAsync(url);
 
+                // if request fails, just return empty list
                 if (!response.IsSuccessStatusCode)
                     return alerts;
 
                 var json = await response.Content.ReadAsStringAsync();
 
+                // convert JSON into C# objects
                 var lines = JsonSerializer.Deserialize<List<TfLLine>>(json,
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
@@ -39,16 +42,16 @@ namespace TrainApp.Models
                 {
                     foreach (var status in elizabeth.LineStatuses)
                     {
-                        // 🔥 PRIORITY: Use Reason FIRST if exists
+                        // try to use the detailed reason first, otherwise fallback to general status
                         string description = !string.IsNullOrWhiteSpace(status.Reason)
                             ? status.Reason
                             : status.StatusSeverityDescription ?? "";
 
-                        // ❌ Ignore empty
+                        // skip if there's nothing useful to show
                         if (string.IsNullOrWhiteSpace(description))
                             continue;
 
-                        // ❌ Only skip TRUE clean "Good Service"
+                        // ignore true "Good Service" with no extra info
                         if (status.StatusSeverityDescription != null &&
                             status.StatusSeverityDescription.Equals("Good Service", StringComparison.OrdinalIgnoreCase) &&
                             string.IsNullOrWhiteSpace(status.Reason))
@@ -56,6 +59,7 @@ namespace TrainApp.Models
                             continue;
                         }
 
+                        // add alert to list
                         alerts.Add(new AlertResult
                         {
                             Description = description.Trim(),
@@ -66,7 +70,7 @@ namespace TrainApp.Models
                     }
                 }
 
-                // ✅ fallback if nothing found
+                // if no alerts found, show default message
                 if (!alerts.Any())
                 {
                     alerts.Add(new AlertResult
@@ -80,6 +84,7 @@ namespace TrainApp.Models
             }
             catch
             {
+                // if something goes wrong (e.g. no internet), show fallback message
                 alerts.Add(new AlertResult
                 {
                     Description = "Unable to fetch live service data",
@@ -92,7 +97,7 @@ namespace TrainApp.Models
             return alerts;
         }
 
-        // 🔍 Improved station extractor
+        // tries to pull station names out of the alert text
         private List<string> ExtractStations(string text)
         {
             var stations = new List<string>();
@@ -102,7 +107,7 @@ namespace TrainApp.Models
 
             text = text.Replace("\n", " ").Trim();
 
-            // between X and Y
+            // handles "between X and Y"
             if (text.Contains("between") && text.Contains(" and "))
             {
                 try
@@ -119,7 +124,7 @@ namespace TrainApp.Models
                 catch { }
             }
 
-            // arrows
+            // handles "X → Y" or "X ↔ Y"
             else if (text.Contains("→") || text.Contains("↔"))
             {
                 try
@@ -136,9 +141,11 @@ namespace TrainApp.Models
                 catch { }
             }
 
+            // remove duplicates just in case
             return stations.Distinct().ToList();
         }
 
+        // works out how serious the disruption is
         private string MapSeverity(string severityText, string description)
         {
             var text = (severityText + " " + description).ToLower();

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using TrainApp.Models; 
+using TrainApp.Models;
 
 namespace TrainApp.Pages
 {
@@ -15,7 +15,7 @@ namespace TrainApp.Pages
         public bool HasActiveDelays { get; set; }
         public DateTime LastUpdated { get; set; }
 
-        // 🔥 inject service
+        // Inject AlertService to fetch live alerts from TfL API
         public AlertsModel()
         {
             _alertService = new AlertService();
@@ -29,7 +29,7 @@ namespace TrainApp.Pages
             LastUpdated = DateTime.Now;
         }
 
-        // 🔥 used by JS refresh
+        // Uses AJAX to fetch latest alerts without reloading the page
         public async Task<IActionResult> OnGetGetActiveAlerts()
         {
             var alerts = await _alertService.GetAlertsAsync();

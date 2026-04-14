@@ -118,7 +118,7 @@ body.dark-mode .text-muted { color: #7a9bc4 !important; }
 <div class="container">
     <div class="alerts-wrapper">
 
-        <!-- 🔴 CLEAR BUTTON -->
+        <!-- CLEAR BUTTON -->
         <button onclick="openClearConfirm()" title="Clear alerts"
             style="position:absolute; top:10px; right:10px; width:36px; height:36px;
             border-radius:50%; border:none; background:#ff6b6b; color:white;">
@@ -152,7 +152,7 @@ body.dark-mode .text-muted { color: #7a9bc4 !important; }
     </div>
 </div>
 
-<!-- 🧾 CONFIRM MODAL -->
+<!-- CONFIRM MODAL -->
 <div id="clearConfirmBox" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
 background:rgba(0,0,0,0.4); justify-content:center; align-items:center;">
     <div style="background:white; padding:20px; border-radius:12px; text-align:center;">
@@ -167,7 +167,7 @@ background:rgba(0,0,0,0.4); justify-content:center; align-items:center;">
 let alertsPaused = false;
 let backup = "";
 
-// ✅ restore cleared state on load
+// restores cleared state on load
 if (sessionStorage.getItem("alertsCleared") === "true") {
     alertsPaused = true;
 }
@@ -191,7 +191,7 @@ function closeClearConfirm() {
     document.getElementById("clearConfirmBox").style.display = "none";
 }
 
-// 🔥 CLEAR ALERTS (instant + persistent)
+// CLEAR ALERTS (instant + persistent)
 function confirmClear() {
     closeClearConfirm();
 
@@ -213,11 +213,11 @@ function confirmClear() {
 
     alertsPaused = true;
 
-    // ✅ persist cleared state
+    // persist cleared state
     sessionStorage.setItem("alertsCleared", "true");
 }
 
-// 🔥 UNDO CLEAR (instant restore)
+// UNDO CLEAR (instant restore)
 function undoClear() {
     const container = document.getElementById("alerts-container");
 
@@ -225,16 +225,16 @@ function undoClear() {
 
     alertsPaused = false;
 
-    // ✅ remove saved state
+    // remove saved state
     sessionStorage.removeItem("alertsCleared");
 }
 
-// 🔄 REFRESH ALERTS
+// REFRESH ALERTS
 async function refreshAlerts() {
 
     const container = document.getElementById("alerts-container");
 
-    // ✅ if cleared, DO NOT fetch
+    // if cleared, DO NOT fetch
     if (alertsPaused) {
         container.innerHTML = `
             <div class="empty-box">
@@ -279,7 +279,7 @@ async function refreshAlerts() {
     }
 }
 
-// 🚀 run
+// run
 refreshAlerts();
 setInterval(refreshAlerts, 15000);
 </script>

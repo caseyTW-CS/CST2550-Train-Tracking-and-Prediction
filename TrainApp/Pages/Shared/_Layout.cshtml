@@ -144,15 +144,15 @@
                 <!-- RIGHT SIDE -->
                 <div class="ms-auto d-flex align-items-center gap-3">
 
-                    <!-- 🚦 SERVICE STATUS -->
+                    <!-- SERVICE STATUS -->
                     <span id="serviceStatus" style="font-weight:500;">
                         ● Loading...
                     </span>
 
-                    <!-- 🌙 DARK MODE TOGGLE -->
+                    <!-- DARK MODE TOGGLE -->
                     <button class="theme-toggle" id="themeToggle" title="Toggle dark mode">🌙</button>
 
-                    <!-- ⭐ FAVOURITES DROPDOWN -->
+                    <!-- FAVOURITES DROPDOWN -->
                     <div class="dropdown">
                         <button id="favBtn" class="btn btn-link p-0 border-0" title="Favourites"
                                 style="font-size:20px; text-decoration:none; line-height:1;"
@@ -167,7 +167,7 @@
                         </ul>
                     </div>
 
-                    <!-- 👤 USER / LOGIN -->
+                    <!-- USER / LOGIN -->
                     @if (Context.Session.GetString("UserName") != null)
                     {
                         <span class="text-white">
@@ -233,7 +233,7 @@
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- 🌙 DARK MODE -->
+<!-- DARK MODE -->
 <script>
     const toggle = document.getElementById('themeToggle');
     const saved = localStorage.getItem('theme');
@@ -248,7 +248,7 @@
     });
 </script>
 
-<!-- 🚦 LIVE SERVICE STATUS -->
+<!-- LIVE SERVICE STATUS -->
 <script>
 fetch("https://api.tfl.gov.uk/Line/elizabeth/Status")
 .then(res => res.json())
@@ -298,7 +298,7 @@ refreshAlertsGlobal();
 setInterval(refreshAlertsGlobal, 15000);
 </script>
 
-<!-- ⭐ FAVOURITES DROPDOWN -->
+<!-- FAVOURITES DROPDOWN -->
 <script>
 document.getElementById('favBtn').addEventListener('show.bs.dropdown', function () {
     fetch('/Account?handler=Favourites')

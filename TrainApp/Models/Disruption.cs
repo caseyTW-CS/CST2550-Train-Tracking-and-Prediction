@@ -3,22 +3,29 @@ using System.Collections.Generic;
 
 namespace TrainApp.Models
 {
+    // Represents a disruption affecting one or more journeys
+    // Groups delayed journeys together and provides a summary
     public class Disruption
     {
-        //PROPERTIES
+        // unique ID for the disruption
         public string disruptionId { get; private set; }
 
+        // reason for the disruption
         public string reason { get; private set; }
 
+        // estimated delay duration in minutes
         public int estimatedDurationMinutes { get; private set; }
 
+        // when the disruption was reported
         public DateTime reportedAt { get; private set; }
 
+        // list of affected journeys
         public List<Journey> affectedJourneys { get; private set; }
 
+        // severity level (Minor / Moderate / Severe)
         public string severity { get; private set; }
 
-        //METHODS
+        // constructor
         public Disruption(string id, string reason, int duration, string severity)
         {
             disruptionId = id;
@@ -29,12 +36,13 @@ namespace TrainApp.Models
             affectedJourneys = new List<Journey>();
         }
 
+        // adds a journey to the disruption
         public void addAffectedJourney(Journey journey)
         {
             affectedJourneys.Add(journey);
         }
 
-        // checks if a journey is delayed and adds it to affected journeys automatically
+        // checks if a journey is delayed and includes it if needed
         public void detectAndFlagDelay(Journey journey)
         {
             if (journey.currentDelayMinutes > 0)
@@ -44,7 +52,7 @@ namespace TrainApp.Models
             }
         }
 
-        // automatically works out severity based on delay minutes
+        // determines severity based on delay time
         public static string calculateSeverity(int delayMinutes)
         {
             if (delayMinutes <= 5)
@@ -55,7 +63,7 @@ namespace TrainApp.Models
                 return "Severe";
         }
 
-        // checks a list of journeys and flags any that are delayed
+        // scans a list of journeys and flags delayed ones
         public void scanJourneysForDelays(List<Journey> journeys)
         {
             foreach (Journey journey in journeys)
@@ -68,7 +76,7 @@ namespace TrainApp.Models
             }
         }
 
-        // returns a readable alert message for this disruption
+        // returns a readable message for display
         public string getAlertMessage()
         {
             return $"[{severity}] Disruption: {reason} - Estimated delay: {estimatedDurationMinutes} mins. " +

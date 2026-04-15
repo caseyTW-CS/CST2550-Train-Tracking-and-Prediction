@@ -46,7 +46,7 @@ This application is designed to provide a simple and accessible way for users to
 
 
 
-## Technologies Used
+## Tech Stack Used
 
 - ASP.NET Core Razor Pages
 - C#

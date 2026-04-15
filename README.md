@@ -55,7 +55,14 @@ This application is designed to provide a simple and accessible way for users to
 - HTML and CSS
 - TfL Unified API
 
+## Database setup
 
+The database used by the application is located in:
+
+TrainApp/Database/TrainApp.db
+
+A SQL script (`schema.sql`) is also included in the same folder.  
+This can be used to recreate the database structure and sample data if required.
 
 ## API Integration
 

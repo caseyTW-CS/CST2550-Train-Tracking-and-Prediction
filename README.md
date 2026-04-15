@@ -1,4 +1,4 @@
-# Where's the Train? 🚆
+# Where's the Train?
 
 Where's the Train? is a web-based application for tracking Elizabeth Line services in real time using the Transport for London (TfL) API. The system allows users to check live departures, monitor service disruptions, and manage personalised travel preferences.
 
@@ -9,10 +9,10 @@ This application is designed to provide a simple and accessible way for users to
 ## Features
 
 ### Live Service Alerts
-- Displays real-time disruption information
-- Classifies severity levels (e.g. minor, moderate, major)
-- Identifies affected sections of the line
-- Includes a notification badge in the navigation bar
+ - Displays real-time disruption information
+ - Indicates severity levels (e.g. minor, moderate, severe)
+ - Highlights affected sections of the Elizabeth Line
+ - Includes a live alert counter
   
 
 ### Departures Board
